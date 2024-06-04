@@ -201,7 +201,31 @@ export class Model {
 
   protected async delete(id: number) {
     try {
-      return await this.dbTable.delete({ where: { id, }, });
+      /* SOFT DELETES */
+
+      this.dbTable.$use(async (params: any, next: any) => {
+        // Check incoming query type
+        if (params.model == 'Post') {
+          if (params.action == 'delete') {
+            // Delete queries
+            // Change action to an update
+            params.action = 'update'
+            params.args['data'] = { deleted: true }
+          }
+          if (params.action == 'deleteMany') {
+            // Delete many queries
+            params.action = 'updateMany'
+            if (params.args.data != undefined) {
+              params.args.data['deleted'] = true
+            } else {
+              params.args['data'] = { deleted: true }
+            }
+          }
+        }
+        return next(params)
+      })
+
+      // return await this.dbTable.delete({ where: { id } });
     } catch (error: any) {
       return PrismaErrorHandler.error(error);
     }
@@ -321,7 +345,7 @@ export class Model {
 
                 if (DATA_STRUCTURE[index].id) {
                   Object.assign(dataStored, { [TABLE_MODEL.name]: DATA_STRUCTURE[index] });
-                }else{
+                } else {
                   const STORED = await TABLE_MODEL.create({ data: DATA_STRUCTURE[index] });
                   Object.assign(dataStored, { [TABLE_MODEL.name]: STORED });
                 }

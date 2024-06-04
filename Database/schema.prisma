@@ -7,29 +7,42 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
+model Countries {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  users Users[]
+}
+
 model Users {
-  id             Int     @id @default(autoincrement())
-  documentType   String  @db.VarChar(25)
-  documentId     String  @unique @db.VarChar(10)
-  name           String  @db.VarChar(50)
-  lastname       String? @db.VarChar(50)
-  cellphone      String  @unique @db.VarChar(10)
-  email          String  @unique
-  password       String? @db.VarChar(100)
-  remember_token String? @unique @db.VarChar(100)
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(30)
+  lastname   String   @db.VarChar(30)
+  documentId String   @db.VarChar(10)
+  phone      String   @db.VarChar(12)
+  email      String   @unique
+  username   String   @unique
+  address    String   @db.VarChar(100)
+  gender     String?  @db.Char(1) // Or M or F
+  birthDate  DateTime
+  city       String   @db.VarChar(30)
 
   Roles   Roles @relation(fields: [role_id], references: [id])
   role_id Int
 
-  Claims  Claims[]
-  Doctors Doctors?
+  Countries  Countries @relation(fields: [country_id], references: [id])
+  country_id Int
 
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+  UsersTransactions UsersTransactions[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deleted   Boolean   @default(false)
+  deletedAt DateTime?
 }
 
 model Roles {
@@ -38,8 +51,8 @@ model Roles {
   Users            Users[]
   RolesPermissions RolesPermissions[]
 
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Permissions {
@@ -58,399 +71,71 @@ model RolesPermissions {
   Permissions   Permissions @relation(fields: [permission_id], references: [id]) // no se ve como campo, solo se registra la relación
   permission_id Int
 
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([role_id, permission_id])
 }
 
-model Departments {
-  id       Int        @id @default(autoincrement())
-  name     String     @db.VarChar(55)
-  Patients Patients[]
+model Categories {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(20)
+
+  UsersTransactions UsersTransactions[]
 }
 
-// model Cyties {
-//   id       Int        @id @default(autoincrement())
-//   name     String     @db.VarChar(55)
-//   Patients Patients[]
-// }
-
-model Insurances {
-  id       Int        @id @default(autoincrement())
-  name     String     @db.VarChar(100)
-  Patients Patients[]
-}
-
-// @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-model Patients {
+model UsersTransactions {
   id Int @id @default(autoincrement())
 
-  documentType String  @db.VarChar(25)
-  documentId   String  @unique @db.VarChar(10)
-  name         String  @db.VarChar(50)
-  lastname     String  @db.VarChar(50)
-  cellphone    String  @unique @db.VarChar(10)
-  email        String  @unique
-  gender       String? @db.Char(1) // Or M or F
-  birthday     String? @db.VarChar(10)
-  age          String  @db.VarChar(3)
-  password     String? @db.VarChar(100)
+  amount_money Decimal @db.Decimal(6, 4)
 
-  Departments   Departments @relation(fields: [department_id], references: [id])
-  department_id Int
+  Users   Users @relation(fields: [user_id], references: [id])
+  user_id Int
 
-  Insurances   Insurances @relation(fields: [insurance_id], references: [id])
-  insurance_id Int
+  Categories  Categories @relation(fields: [category_id], references: [id])
+  category_id Int
 
-  PatientVitalSigns  PatientVitalSigns[]
-  PatientAllergies   PatientAllergies[]
-  PatientBackgrounds PatientBackgrounds[]
-  Appointments       Appointments[] // paciente puede tener muchas citas
+  Bets   Bets? @relation(fields: [bet_id], references: [id])
+  bet_id Int?
 
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model PatientBackgrounds {
-  id          Int    @id @default(autoincrement())
-  type        String @db.VarChar(25)
-  description String @db.VarChar(1000)
-
-  Patients   Patients @relation(fields: [patient_id], references: [id])
-  patient_id Int
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+model Sports {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique
+  Events Events[]
 }
 
-model PatientAllergies {
-  id            Int    @id @default(autoincrement())
-  allergy       String @db.VarChar(50)
-  allergyDetail String @db.VarChar(500)
+model Events {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(50)
+  event_place String   @db.VarChar(50)
+  event_date  DateTime
+  Sports      Sports   @relation(fields: [sport_id], references: [id])
+  sport_id    Int
 
-  Patients   Patients @relation(fields: [patient_id], references: [id])
-  patient_id Int
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+  Bets Bets[]
 }
 
-model PatientVitalSigns {
-  id         Int      @id @default(autoincrement())
-  Patients   Patients @relation(fields: [patient_id], references: [id])
-  patient_id Int
-
-  bloodPressure      String?  @db.VarChar(10)
-  heartRate          Int?
-  breathingFrecuency Int?
-  temperature        Decimal? @db.Decimal(3, 1)
-  oxygenSaturation   Int?
-  weight             Decimal? @db.Decimal(4, 1)
-  height             Decimal? @db.Decimal(3, 2)
-  bloodGlucose       Int?
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+model Teams {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  Bets Bets[]
 }
 
-model Medicines {
-  id                        Int                         @id @default(autoincrement())
-  name                      String                      @db.VarChar(30)
-  presentation              String                      @db.VarChar(30)
-  MedicinesMedicalHistories MedicinesMedicalHistories[]
+model Bets {
+  id         Int     @id @default(autoincrement())
+  bet_option Int
+  odd        Float
+  status     String  @default("active") // active, cancelled, settled
+  result     String? // won, lost
 
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
+  event    Events @relation(fields: [event_id], references: [id])
+  event_id Int
 
-  @@unique([name, presentation])
-}
-
-model Incapacities {
-  id             Int     @id @default(autoincrement())
-  type           String  @db.VarChar(30)
-  start          String  @db.VarChar(10)
-  endup          String  @db.VarChar(10)
-  total          Int
-  details        String? @db.VarChar(1000)
-  recommendation String? @db.VarChar(1000)
-
-  MedicalHistories   MedicalHistories @relation(fields: [medical_history_id], references: [id])
-  medical_history_id Int
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model VaccineFollowUps {
-  id             Int    @id @default(autoincrement())
-  vaccineName    String @db.VarChar(30)
-  aplicationDate String @db.VarChar(10)
-  dose           String @db.VarChar(30)
-
-  MedicalHistories   MedicalHistories @relation(fields: [medical_history_id], references: [id])
-  medical_history_id Int
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model MedicalExams {
-  id             Int    @id @default(autoincrement())
-  type           String @db.VarChar(30)
-  examDate       String @db.VarChar(10)
-  result         String @db.VarChar(1000)
-  recommendation String @db.VarChar(1000)
-  file           Bytes?
-
-  MedicalHistories   MedicalHistories @relation(fields: [medical_history_id], references: [id])
-  medical_history_id Int
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model MedicalHistories {
-  id                   Int    @id @default(autoincrement())
-  medical_history_code String @unique @db.VarChar(12)
-  patient_document_id  String @db.VarChar(10)
-  patient_name         String @db.VarChar(50)
-  patient_lastname     String @db.VarChar(50)
-  patient_cellphone    String @db.VarChar(10)
-  patient_email        String
-
-  appointment_date DateTime @db.Timestamptz(0)
-
-  doctor_document_id     String  @db.VarChar(10)
-  doctor_professional_id String?
-  doctor_name            String  @db.VarChar(50)
-  doctor_lastname        String  @db.VarChar(50)
-  doctor_cellphone       String  @db.VarChar(10)
-  doctor_email           String
-  service_name           String  @db.VarChar(50)
-  observation            String  @db.VarChar(2000)
-  diagnosis              String  @db.VarChar(1000)
-
-  MedicinesMedicalHistories MedicinesMedicalHistories[]
-  Incapacities              Incapacities[]
-  VaccineFollowUps          VaccineFollowUps[]
-  MedicalExams              MedicalExams[]
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model MedicinesMedicalHistories {
-  id          Int    @id @default(autoincrement())
-  quantity    String @db.VarChar(10)
-  frequency   String @db.VarChar(20)
-  duration    String @db.VarChar(20)
-  instruction String @db.VarChar(300)
-
-  Medicines   Medicines @relation(fields: [medicine_id], references: [id])
-  medicine_id Int
-
-  MedicalHistories   MedicalHistories @relation(fields: [medical_history_id], references: [id])
-  medical_history_id Int
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-
-  @@unique([medicine_id, medical_history_id])
-}
-
-model MedicalServices {
-  id      Int       @id @default(autoincrement())
-  service String    @unique @db.VarChar(50)
-  Doctors Doctors[]
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model Doctors {
-  id             Int     @id @default(autoincrement())
-  professionalId String? @unique @db.VarChar(10)
-  Users          Users   @relation(fields: [user_id], references: [id])
-  user_id        Int     @unique
-
-  MedicalServices    MedicalServices @relation(fields: [medical_service_id], references: [id])
-  medical_service_id Int
-
-  AppointmentDates AppointmentDates[]
-}
-
-model Hours {
-  id    Int                @id @default(autoincrement())
-  hour  String             @db.VarChar(10)
-  Hours AppointmentDates[]
-}
-
-model Years {
-  id    Int                @id @default(autoincrement())
-  year  String             @db.VarChar(4)
-  Years AppointmentDates[]
-}
-
-model Months {
-  id     Int                @id @default(autoincrement())
-  month  String             @db.VarChar(20)
-  Months AppointmentDates[]
-}
-
-model AppointmentDates {
-  id Int @id @default(autoincrement())
-
-  Doctors   Doctors @relation(fields: [doctor_id], references: [id])
-  doctor_id Int
-
-  Hours   Hours @relation(fields: [hour_id], references: [id]) // no se ve como campo, solo se registra la relación
-  hour_id Int
-
-  day_num String @db.VarChar(2)
-
-  Months   Months @relation(fields: [month_id], references: [id]) // no se ve como campo, solo se registra la relación
-  month_id Int
-
-  Years   Years @relation(fields: [year_id], references: [id]) // no se ve como campo, solo se registra la relación
-  year_id Int
-
-  available Boolean
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-
-  Appointments Appointments[]
-
-  @@unique([doctor_id, day_num, hour_id, month_id, year_id])
-}
-
-model HistoryCalls {
-  id                  Int       @id @default(autoincrement())
-  patient_document_id String?   @db.VarChar(10)
-  patient_name        String?   @db.VarChar(50)
-  patient_lastname    String?   @db.VarChar(50)
-  patient_cellphone   String?   @db.VarChar(10)
-  patient_email       String?
-  appointment_date    DateTime? @db.Timestamptz(0)
-
-  call_direction     String   @db.VarChar(10)
-  status_call        String
-  call_answered      Boolean?
-  attend_appointment Boolean?
-  time_elapsed       Int
-  price              Decimal  @db.Decimal(6, 4)
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model HistoryAppointments {
-  id                     Int      @id @default(autoincrement())
-  patient_document_id    String   @db.VarChar(10)
-  patient_name           String   @db.VarChar(50)
-  patient_lastname       String   @db.VarChar(50)
-  patient_cellphone      String   @db.VarChar(10)
-  patient_email          String
-  appointment_date       DateTime @db.Timestamptz(0)
-  doctor_document_id     String   @db.VarChar(10)
-  doctor_professional_id String?
-  doctor_name            String   @db.VarChar(50)
-  doctor_lastname        String   @db.VarChar(50)
-  doctor_cellphone       String   @db.VarChar(10)
-  doctor_email           String
-  service_name           String   @db.VarChar(50)
-  attend_appointment     Boolean?
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model HistoryUserChanges {
-  id               Int    @id @default(autoincrement())
-  user_document_id String
-  user_name        String @db.VarChar(50)
-  user_lastname    String @db.VarChar(50)
-  action           String @db.VarChar(10)
-  module           String @db.VarChar(100)
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-}
-
-model Appointments {
-  id         Int      @id @default(autoincrement())
-  Patients   Patients @relation(fields: [patient_id], references: [id]) // no se ve como campo, solo se registra la relación
-  patient_id Int
-
-  AppointmentDates    AppointmentDates @relation(fields: [appointment_date_id], references: [id])
-  appointment_date_id Int              @unique
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model CommunicationServices {
-  id                Int      @id @default(autoincrement())
-  name              String   @unique @db.VarChar(50)
-  status            Boolean  @default(false)
-  rangeDaysToRemind Int?
-  hourEnable        String?
-  hourDisable       String?
-  activateDate      DateTime @default(now()) @db.Timestamptz(0)
-  createdAt         DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt         DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model EnterpriseInformations {
-  id          Int     @id @default(autoincrement())
-  name        String  @db.VarChar(30)
-  logo        Bytes?
-  nit         String  @db.VarChar(9)
-  email       String  @unique
-  headquarter String  @db.VarChar(30)
-  address     String  @db.VarChar(100)
-  cellphone   String  @db.VarChar(10)
-  telephone   String? @db.VarChar(7)
-
-  legalDocumentation Bytes?
-  legalDataTreatment Bytes?
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-}
-
-model Claims {
-  id Int @id @default(autoincrement())
-
-  documentType String  @db.VarChar(25)
-  documentId   String  @db.VarChar(10)
-  name         String  @db.VarChar(50)
-  lastname     String  @db.VarChar(50)
-  cellphone    String  @unique @db.VarChar(10)
-  email        String  @unique
-  gender       String? @db.Char(1) // Or M or F
-  age          String  @db.VarChar(3)
-
-  code     String   @unique @db.VarChar(12)
-  subject  String   @db.VarChar(50)
-  concept  String   @db.VarChar(500)
-  priority Priority @default(LOW)
-  file     Bytes?
-
-  Users   Users?    @relation(fields: [user_id], references: [id])
-  user_id Int?
-  status  Boolean?  @default(false)
-  deleted DateTime?
-
-  createdAt DateTime @default(now()) @db.Timestamptz(0)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(0)
-
-  @@unique([documentId, subject])
-}
-
-enum Priority {
-  LOW
-  MEDIUM
-  HIGH
-  IMMEDIATE
+  Teams             Teams               @relation(fields: [team_id], references: [id])
+  team_id           Int
+  UsersTransactions UsersTransactions[]
 }
