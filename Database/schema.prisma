@@ -18,19 +18,19 @@ model Countries {
 }
 
 model Users {
-  id             Int      @id @default(autoincrement())
-  documentId     String   @db.VarChar(10)
-  name           String   @db.VarChar(30)
-  lastname       String   @db.VarChar(30)
-  cellphone      String   @db.VarChar(12)
-  email          String   @unique
-  address        String   @db.VarChar(100)
-  gender         String?  @db.Char(1) // Or M or F
-  birthDate      String   @db.VarChar(10) // 1997-03-03 or 13/03/1997 string
-  city           String   @db.VarChar(30)
-  username       String   @unique
-  password       String?  @db.VarChar(100)
-  remember_token String?  @unique @db.VarChar(100)
+  id             Int     @id @default(autoincrement())
+  documentId     String  @db.VarChar(10)
+  name           String  @db.VarChar(30)
+  lastname       String  @db.VarChar(30)
+  cellphone      String  @db.VarChar(12)
+  email          String  @unique
+  address        String  @db.VarChar(100)
+  gender         String? @db.Char(1) // Or M or F
+  birthDate      String  @db.VarChar(10) // 1997-03-03 or 13/03/1997 string
+  city           String  @db.VarChar(30)
+  username       String  @unique
+  password       String? @db.VarChar(100)
+  remember_token String? @unique @db.VarChar(100)
 
   Roles   Roles @relation(fields: [role_id], references: [id])
   role_id Int
@@ -39,12 +39,21 @@ model Users {
   country_id Int
 
   UsersTransactions UsersTransactions[]
+  BankAccounts      BankAccounts?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
+}
+
+model BankAccounts {
+  id               Int     @id @default(autoincrement())
+  available_amount Decimal @db.Decimal(6, 4)
+
+  Users   Users @relation(fields: [user_id], references: [id])
+  user_id Int   @unique
 }
 
 model Roles {

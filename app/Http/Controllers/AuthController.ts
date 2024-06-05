@@ -35,7 +35,6 @@ export class AuthController extends UserModel {
         }
     }
 
-
     registerAdmin = async (req: Request, res: Response): Promise<Response> => {
         try {
             const AUTH_HEADER: string | undefined = req.headers.authorization;
@@ -61,54 +60,12 @@ export class AuthController extends UserModel {
         }
     }
 
-    updateProfile = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            const AUTH_HEADER: string | undefined = req.headers.authorization;
-            const ADMIN_USER: USER_TYPE = await JWT.decodeToken(AUTH_HEADER);
-
-            if (!ADMIN_USER) return res.status(401).json({ error: { message: ERROR_MESSAGES.UNAUTHENTICATED } });
-            if (!(await JWT.validatePermission(AUTH_HEADER, 'EDIT-PROFILE'))) return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
-
-            req.body.password = ADMIN_USER.password;
-            req.body.email.replace(/\s+/g, '');
-
-            const SAVE = await this.update(ADMIN_USER.id, req.body);
-            if (SAVE.error) return res.status(409).json({ error: { message: `${SAVE.error}` } });
-
-            return res.status(200).json(SAVE);
-        } catch (error: any) {
-            return res.status(400).json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
-        }
-    };
-
-    updatePasswordProfile = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            /* Recoger la autorización*/
-            const AUTH_HEADER: string | undefined = req.headers.authorization;
-            const ADMIN_USER: USER_TYPE = await JWT.decodeToken(AUTH_HEADER);
-            delete ADMIN_USER.iat;
-
-            if (!ADMIN_USER) return res.status(401).json({ error: { message: ERROR_MESSAGES.UNAUTHENTICATED } });
-            if (!(await JWT.validatePermission(AUTH_HEADER, 'EDIT-PROFILE'))) return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
-
-            /* Validar el password actual antes de ingresar uno nuevo */
-            const CURRENT_PASS: string = Encrypt.encryptPassword(req.body.oldPassword);
-            const PASSWORD: string = req.body.password;
-
-            if (CURRENT_PASS !== ADMIN_USER.password) return res.status(401).json({ error: { message: ERROR_MESSAGES.WRONG_CURRENT_PASSWORD } });
-            if (!PasswordHandler.isPasswordValid(PASSWORD)) return res.status(401).json({ error: { message: ERROR_MESSAGES.INVALID_CHARACTERS } });
-
-            const ENCRYPTED_PASSWORD: string = Encrypt.encryptPassword(PASSWORD);
-
-            // Ordenar nuevo dato para insertar el nuevo password
-            ADMIN_USER.password = ENCRYPTED_PASSWORD;
-            return res.status(200).json(await DB.table('Users').update(ADMIN_USER.id, ADMIN_USER));
-        } catch (error: any) {
-            return res.status(400).json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
-        }
-    };
-
-    private verifyEmail = async (email: string): Promise<USER_TYPE> => {
+    /**
+       * Función que recibe tablas como llaves y datos
+       * @param {string} field recibe el valor de la columna con la que se evaluará la existencia email o username
+       * @param {string} value recibe el valor string de email o username
+    */
+    private verifyUser = async (field: 'email' | 'username', value: string): Promise<USER_TYPE> => {
         const USER = Object.values(await DB.table('Users').with(
             [{
                 Roles: {
@@ -125,19 +82,20 @@ export class AuthController extends UserModel {
                         }
                     }
                 }
-            }]).where('email', email).get<USER_TYPE>())[0];
+            }]).where(field, value).get<USER_TYPE>())[0];
         return USER;
     }
 
-    private resetLoginAttempts = (email: string): void => {
+
+    private resetLoginAttempts = (username: string): void => {
         setTimeout(() => {
-            this.loginAttemptsByUser.delete(email);
+            this.loginAttemptsByUser.delete(username);
         }, 60000 * this.MAX_LOGIN_ATTEMPTS);
     }
 
-    attemptsExceeded = (attempts: number, email: string): boolean => {
+    attemptsExceeded = (attempts: number, username: string): boolean => {
         if (attempts === this.MAX_LOGIN_ATTEMPTS) {
-            this.resetLoginAttempts(email);
+            this.resetLoginAttempts(username);
             return true;
         }
         return false;
@@ -145,23 +103,23 @@ export class AuthController extends UserModel {
 
     authenticateAdmin = async (req: Request, res: Response): Promise<any> => {
         try {
-            const EMAIL: string = req.body.email.replace(/\s+/g, '');
-            let loginAttempts = this.loginAttemptsByUser.get(EMAIL) || 0;
+            const USERNAME: string = req.body.username.replace(/\s+/g, '');
+            let loginAttempts = this.loginAttemptsByUser.get(USERNAME) || 0;
 
-            if (this.attemptsExceeded(loginAttempts, EMAIL)) {
+            if (this.attemptsExceeded(loginAttempts, USERNAME)) {
                 return res.status(429).json({ error: { message: ERROR_MESSAGES.MAX_ATTEMPTS_EXCEEDED } });
             }
 
-            const ADMIN: USER_TYPE = await this.verifyEmail(EMAIL);
+            const ADMIN: USER_TYPE = await this.verifyUser('username', USERNAME);
             if (!ADMIN) {
                 loginAttempts++;
-                this.loginAttemptsByUser.set(EMAIL, loginAttempts);
+                this.loginAttemptsByUser.set(USERNAME, loginAttempts);
                 return res.status(401).json({ error: { message: ERROR_MESSAGES.WRONG_LOGIN_CREDENTIALS } });
             }
 
             if (ADMIN.password !== Encrypt.encryptPassword(req.body.password)) {
                 loginAttempts++;
-                this.loginAttemptsByUser.set(EMAIL, loginAttempts);
+                this.loginAttemptsByUser.set(USERNAME, loginAttempts);
                 return res.status(401).json({ error: { message: ERROR_MESSAGES.WRONG_LOGIN_CREDENTIALS } });
             }
 
@@ -169,7 +127,7 @@ export class AuthController extends UserModel {
             const TOKEN = await JWT.createToken(ADMIN);
 
             /* resetea los intentos para este usuario */
-            this.loginAttemptsByUser.delete(EMAIL);
+            this.loginAttemptsByUser.delete(USERNAME);
 
             res.cookie('jwt', TOKEN, {
                 sameSite: 'strict',
@@ -210,7 +168,7 @@ export class AuthController extends UserModel {
     sendEmailToken = async (req: Request, res: Response): Promise<any> => {
         try {
             const RECOVERY_EMAIL: string = req.body.email;
-            const ADMIN_DATA: USER_TYPE | undefined = await this.verifyEmail(RECOVERY_EMAIL);
+            const ADMIN_DATA: USER_TYPE | undefined = await this.verifyUser('email', RECOVERY_EMAIL);
             if (!ADMIN_DATA) return res.status(404).json({ error: { message: ERROR_MESSAGES.WRONG_LOGIN_EMAIL } });
 
             const ADMIN_TOKEN_ESTABLISHED: USER_TYPE = await this.setRememberPasswordToken(ADMIN_DATA);

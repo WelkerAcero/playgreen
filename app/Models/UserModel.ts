@@ -11,7 +11,7 @@ export class UserModel extends Model {
     'documentId': { type: 'string', min: 8, max: 10 },
     'name': { type: 'string', max: 30 },
     'lastname': { type: 'string', max: 30 },
-    'cellphone': { type: 'string', min: 12 },
+    'cellphone': { type: 'string', min: 10, max: 12 },
     'email': { type: 'string' },
     'address': { type: 'string', max: 100 },
     'gender': { type: 'string', max: 1 },
