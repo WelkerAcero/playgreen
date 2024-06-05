@@ -1,17 +1,21 @@
 export type USER_TYPE = {
     id: number,
-    documentType: string,
     documentId: string,
     name: string,
     lastname: string,
     cellphone: string,
     email: string,
+    address: string,
+    gender?: string | undefined | null,
+    birthDate: string,
+    city: string,
+    username: string,
     password: string,
     role_id: number,
+    country_id: number,
     remember_token?: string | null,
 
     Roles?: ROLES_TYPE,
-
     createdAt?: Date,
     updatedAt?: Date,
     iat?: number

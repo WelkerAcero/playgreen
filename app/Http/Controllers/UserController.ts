@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { UserModel } from "../../Models/UserModel";
 import { JWT } from "../../helpers/JWT";
-import { DB } from "../../helpers/DB";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../../../config/statusMessages/messages";
 import { DataOrganizer } from "../../helpers/DataOrganizer";
 import { USER_TYPE } from '../../../config/dataStructure/structure';
@@ -37,23 +36,6 @@ export class UserController extends UserModel {
             );
 
             return res.status(200).json(USER_LIST);
-        } catch (error: any) {
-            return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
-        }
-    };
-
-    getUserRoles = async (req: Request, res: Response): Promise<any> => {
-        try {
-            const AUTH: string | undefined = req.headers.authorization;
-            /* Si es superAdmin => puede crear rol super admin, sino entonces solo admin y otros */
-            if (await JWT.validatePermission(AUTH, 'ROLE-READ')) {
-                return res.status(200).json(await DB.table('Roles').select(['id', 'rol_name']).get());
-            }
-
-            // if (await JWT.validatePermission(AUTH, 'CREATE')) {
-            //     return res.status(200).json(await DB.table('Roles').select(['id', 'rol_name']).whereNot('rol_name', 'SuperAdmin').get());
-            // }
-
         } catch (error: any) {
             return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
         }

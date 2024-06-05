@@ -13,7 +13,7 @@ export const ERROR_MESSAGES = {
   MISSING_RECOVERY_TOKEN: "El Token de recuperación no coincide o ya ha expirado",
   CONSTRAINT_ON_DELETE: "El registro no puede ser eliminado. Primero debe eliminar los registros asociados a esta entidad",
   DELETE_NOT_EXIST: "El registro no existe, por favor actualiza tu página",
-  INVALID_CHARACTERS: "El campo 'contraseña' posee caracteres no permitidos o no cumple con los criterios establecidos.",
+  INVALID_CHARACTERS: "El campo 'contraseña' posee caracteres no permitidos o no cumple con los criterios establecidos. Asegurate de usar una longitud de 8 y usar almenos 1 simbolo y números",
   INVALID_DATE: "La fecha ingresada es menor a la actual, por favor asegurese de ingresar una fecha valida",
 };
 

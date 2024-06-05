@@ -15,6 +15,27 @@ export class AuthController extends UserModel {
     private usersWithRecoveryTokenVerified: USER_TYPE[] = [];
     private recoveryTokensList: string[] = [];
 
+    registerNonCredentials = async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const PASSWORD = req.body.password;
+            if (!PasswordHandler.isPasswordValid(PASSWORD)) return res.status(401).json({ error: { message: ERROR_MESSAGES.INVALID_CHARACTERS } });
+
+            const ENCRYPTED_PASSWORD: string = Encrypt.encryptPassword(PASSWORD);
+            req.body.password = ENCRYPTED_PASSWORD;
+            req.body.email.replace(/\s+/g, '');
+
+            const DATA: USER_TYPE = req.body;
+            const STORE = await this.create(DATA);
+            if (STORE?.error) return res.status(409).json({ error: { message: `${STORE.error}` } });
+
+            return res.status(201).json(STORE);
+        } catch (error: any) {
+            console.log(error);
+            return res.status(400).json(error);
+        }
+    }
+
+
     registerAdmin = async (req: Request, res: Response): Promise<Response> => {
         try {
             const AUTH_HEADER: string | undefined = req.headers.authorization;
@@ -30,10 +51,10 @@ export class AuthController extends UserModel {
             req.body.email.replace(/\s+/g, '');
 
             const DATA: USER_TYPE = req.body;
-            const SAVE = await this.create(DATA);
-            if (SAVE.error) return res.status(409).json({ error: { message: `${SAVE.error}` } });
+            const STORE = await this.create(DATA);
+            if (STORE?.error) return res.status(409).json({ error: { message: `${STORE.error}` } });
 
-            return res.status(201).json(SAVE);
+            return res.status(201).json(STORE);
         } catch (error: any) {
             console.log(error);
             return res.status(400).json(error);
@@ -73,6 +94,7 @@ export class AuthController extends UserModel {
             /* Validar el password actual antes de ingresar uno nuevo */
             const CURRENT_PASS: string = Encrypt.encryptPassword(req.body.oldPassword);
             const PASSWORD: string = req.body.password;
+
             if (CURRENT_PASS !== ADMIN_USER.password) return res.status(401).json({ error: { message: ERROR_MESSAGES.WRONG_CURRENT_PASSWORD } });
             if (!PasswordHandler.isPasswordValid(PASSWORD)) return res.status(401).json({ error: { message: ERROR_MESSAGES.INVALID_CHARACTERS } });
 
@@ -89,10 +111,21 @@ export class AuthController extends UserModel {
     private verifyEmail = async (email: string): Promise<USER_TYPE> => {
         const USER = Object.values(await DB.table('Users').with(
             [{
-                Doctors: { select: { id: true, MedicalServices: { select: { id: true, service: true } } } },
-                Roles: { select: { id: true, rol_name: true, RolesPermissions: { select: { id: true, role_id: true, permission_id: true, Permissions: true } } } }
-            }])
-            .where('email', email).get<USER_TYPE>())[0];
+                Roles: {
+                    select: {
+                        id: true,
+                        rol_name: true,
+                        RolesPermissions: {
+                            select: {
+                                id: true,
+                                role_id: true,
+                                permission_id: true,
+                                Permissions: true
+                            }
+                        }
+                    }
+                }
+            }]).where('email', email).get<USER_TYPE>())[0];
         return USER;
     }
 
@@ -186,17 +219,17 @@ export class AuthController extends UserModel {
 
                 const EMAIL: EmailProvider = new EmailProvider();
                 EMAIL.sendEmail(
-                    "Medical Application Service",
+                    "SPORT BOOK APPLICATION",
                     RECOVERY_EMAIL,
                     "This is the token for you reset password",
                     "Remember this token should be copy & paste in the field: 'Verification Code'",
-                    `<h1>This token is valid for 10 minutes after being received.</h1><br>
-                    <h3><b>Verification token:</b></h3> <br> ${ADMIN_TOKEN_ESTABLISHED.remember_token}`
+                    `<h3>This token is valid for 10 minutes after being received.</h3><br>
+                    <h1>Verification token:</h1> <br> <b>${ADMIN_TOKEN_ESTABLISHED.remember_token}</b>`
                 );
 
                 await this.activateTokenExpiration(ADMIN_TOKEN_ESTABLISHED);
             }
-            return res.status(200).json({ message: "El código de verificación ha sido enviado al correo. El token expirará en 10 minutos apartir de este momento" });
+            return res.status(200).json({ message: "Verification code has been sent to the email. This token will expire in 10 minutes from this moment" });
         } catch (error) {
             console.log(error);
             return res.status(400).json({ error: { message: error } });

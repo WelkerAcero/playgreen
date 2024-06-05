@@ -4,6 +4,7 @@ import { AuthController } from "../../app/Http/Controllers/AuthController";
 const CONTROLLER = new AuthController();
 const router = Router();
 
+router.post("/register-non-credentials", CONTROLLER.registerNonCredentials);
 router.post("/admin-register", CONTROLLER.registerAdmin);
 router.post("/login", CONTROLLER.authenticateAdmin);
 router.post("/verify-recovery-token", CONTROLLER.verifyRecoveryToken);
