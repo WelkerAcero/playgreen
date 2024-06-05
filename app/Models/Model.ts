@@ -52,8 +52,8 @@ export class Model {
       action,
       module,
     }
-    const CHANGES = await this.prisma.historyUserChanges.create({ data: DATA_TO_STORE });
-    if (CHANGES) console.log('Los cambios del usuario han sido guardados:', CHANGES);
+    // const CHANGES = await this.prisma.historyUserChanges.create({ data: DATA_TO_STORE });
+    // if (CHANGES) console.log('Los cambios del usuario han sido guardados:', CHANGES);
   }
 
   select(fields: string[] | string): Model {

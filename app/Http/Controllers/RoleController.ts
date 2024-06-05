@@ -120,7 +120,7 @@ export class RoleController extends RoleModel {
             for (const obj of ROLES_PERMISSIONS) if (obj.id) await DB.delete(obj.id);
 
             const DELETE = await this.delete(ROLE_ID);
-            if (DELETE.error) return res.status(409).json({ error: { message: DELETE.error } });
+            if (DELETE?.error) return res.status(409).json({ error: { message: DELETE.error } });
 
             return res.status(204).json({ message: SUCCESS_MESSAGES.DELETED });
         } catch (error: any) {
