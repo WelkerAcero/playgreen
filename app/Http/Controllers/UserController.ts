@@ -3,9 +3,10 @@ import { UserModel } from "../../Models/UserModel";
 import { JWT } from "../../helpers/JWT";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../../../config/statusMessages/messages";
 import { DataOrganizer } from "../../helpers/DataOrganizer";
-import { USER_TYPE } from '../../../config/dataStructure/structure';
+import { BANK_ACCOUNTS_TYPE, USER_TYPE } from '../../../config/dataStructure/structure';
 import { PasswordHandler } from "../../../config/inputHandler/PasswordHandler";
 import { Encrypt } from "../../helpers/ENCRYPT";
+import { DB } from "../../helpers/DB";
 
 export class UserController extends UserModel {
 
@@ -123,22 +124,4 @@ export class UserController extends UserModel {
     //         return res.status(409).json({ error: { message: error } });
     //     }
     // };
-
-    depositMoney = async (req: Request, res: Response): Promise<Response> => {
-        try {
-            if (!(await JWT.validatePermission(req.headers.authorization, 'MAKE-DEPOSIT'))) {
-                return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
-            }
-            
-            const ID: number = parseInt(req.params.id);
-            const NEW_DATA: USER_TYPE = req.body;
-
-            const SAVE = await this.update(ID, NEW_DATA);
-            if (SAVE.error) return res.status(409).json({ error: { message: `${SAVE.error}` } });
-
-            return res.status(200).json({ message: SUCCESS_MESSAGES.UPDATED });
-        } catch (error: any) {
-            return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
-        }
-    };
 }

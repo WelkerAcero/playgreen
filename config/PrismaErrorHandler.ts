@@ -63,7 +63,7 @@ export class PrismaErrorHandler {
                 break;
 
             default:
-                replaceFieldName = '';
+                replaceFieldName = 'Detalles: esta información ya esta registrada en la base de datos';
                 break;
         }
         return replaceFieldName;

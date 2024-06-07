@@ -1,6 +1,6 @@
 export const ERROR_MESSAGES = {
   PERMISSIONS_DENIED: "No posees los permisos para esta acción",
-  DUPLICATE_DATA: "Existe un campo duplicado. Verifique y vuelva a intentarlo en: ",
+  DUPLICATE_DATA: "Existe un campo duplicado. Verifique e intente nuevamente",
   DATA_TOO_LONG: "Existe un dato que excede el máximo esperado",
   CLIENT_SERVER_ERROR: "El servidor no puede devolver una respuesta debido a un error del cliente",
   UNAUTHENTICATED: "No te encuentras autenticado por el sistema",
@@ -15,6 +15,8 @@ export const ERROR_MESSAGES = {
   DELETE_NOT_EXIST: "El registro no existe, por favor actualiza tu página",
   INVALID_CHARACTERS: "El campo 'contraseña' posee caracteres no permitidos o no cumple con los criterios establecidos. Asegurate de usar una longitud de 8 y usar almenos 1 simbolo y números",
   INVALID_DATE: "La fecha ingresada es menor a la actual, por favor asegurese de ingresar una fecha valida",
+  INCORRECT_DEPOSIT_AMOUNT: "El valor del monto a depositar no pueden ser valores negativos. Intente nuevamente",
+  BANK_ACCOUNT_DOESNT_EXIST: "El número de cuenta no existe, trata de ingresar una cuenta válida de tu usuario o crea una cuenta de banco a tu usuario",
 };
 
 export const SUCCESS_MESSAGES = {

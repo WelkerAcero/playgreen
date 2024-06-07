@@ -428,7 +428,7 @@ export class Model {
    * @param {string} foreignName Recibe el nombre de la columna que es foranea en la tabla2 que depende de la creación de la tabla1
    * @returns {object} devuelve la relación con la tabla1 que tiene el modelo donde se esta usando la función
     */
-  protected async interactiveStoreTransaction(table1: string, dataTable1: object, table2: string, dataTable2: object, foreignName: string): Promise<any> {
+  protected async interactiveStoreRelationalTransaction(table1: string, dataTable1: object, table2: string, dataTable2: object, foreignName: string): Promise<any> {
     try {
       // table1 and table2 must have the data table name, example: Doctors, Users
       if (!PRISMA.hasOwnProperty(table1) || !PRISMA.hasOwnProperty(table2)) {
@@ -450,6 +450,40 @@ export class Model {
         await TABLE_MODEL_2.create({ data: { ...dataTable2, [foreignName]: STORE_TABLE_1.id } });
 
         return await this.with([table1]).where('id', STORE_TABLE_1.id).get();
+      });
+    } catch (error: any) {
+      return PrismaErrorHandler.error(error);
+    }
+  }
+
+  protected async storeAndUpdateTransaction(table1: string, dataTable1: object, table2: string, updateData: object, updateField: string): Promise<any> {
+    try {
+      // Validar si las tablas existen en el cliente de Prisma
+      if (!PRISMA.hasOwnProperty(table1) || !PRISMA.hasOwnProperty(table2)) {
+        return { error: 'One or both of the provided table names are not valid.', valid: false };
+      }
+  
+      // BEFORE ENTER IN THE TRANSACTION MAKE VALIDATION
+      const VALIDATION_MODEL1 = await this.validateRules((PRISMA as any)[table1], dataTable1);
+      if (!VALIDATION_MODEL1.valid) return { error: `${VALIDATION_MODEL1.error}` }
+
+      const VALIDATION_MODEL2 = await this.validateRules((PRISMA as any)[table2], updateData);
+      if (!VALIDATION_MODEL2.valid) return { error: `${VALIDATION_MODEL2.error}` }
+  
+      return await PRISMA.$transaction(async (tx) => {
+        const TABLE_MODEL_1 = (tx as any)[table1];
+        const TABLE_MODEL_2 = (tx as any)[table2];
+  
+        const STORE = await TABLE_MODEL_1.create({ data: dataTable1 });
+        const UPDATE = await TABLE_MODEL_2.update({
+          where: { [updateField]: (updateData as any)[updateField] },
+          data: updateData
+        });
+  
+        return { 
+          [table1]: STORE,
+          [table2]: UPDATE
+         };
       });
     } catch (error: any) {
       return PrismaErrorHandler.error(error);

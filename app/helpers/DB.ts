@@ -186,16 +186,16 @@ export class DB {
     static async update(id: number, newData: object) {
         try {
             const MAIN_TABLE = DB.dbTable; // Guardar la referencia a la tabla principal
-    
+
             if (DB.dbTable.name.toString().includes('_')) return await this.dbTable.update({ where: { id: id }, data: newData });
-    
+
             const RULES: object = await this.importModelRules(DB.dbTable.name.toString());
             const INPUT_VALIDATION: VALIDATION_TYPE = await InputHandler.validateInputs(newData, RULES);
             if (!INPUT_VALIDATION.valid) return { error: `${INPUT_VALIDATION.error}` }
-    
+
             // Restaurar la referencia a la tabla principal después de cualquier operación que la pueda cambiar
             DB.dbTable = MAIN_TABLE;
-    
+
             const result = await this.dbTable.update({
                 where: {
                     id: id,
@@ -345,7 +345,7 @@ export class DB {
      * @param {string} foreignName Recibe el nombre de la columna que es foranea en la tabla2 que depende de la creación de la tabla1
      * @returns {object} devuelve la relación con la tabla1 que tiene el modelo donde se esta usando la función
       */
-    static async interactiveStoreTransaction(table1: string, dataTable1: object, table2: string, dataTable2: object, foreignName: string): Promise<any> {
+    static async interactiveStoreRelationalTransaction(table1: string, dataTable1: object, table2: string, dataTable2: object, foreignName: string): Promise<any> {
         try {
             // table1 and table2 must have the data table name, example: Doctors, Users
             if (!PRISMA.hasOwnProperty(table1) || !PRISMA.hasOwnProperty(table2)) {
@@ -367,6 +367,34 @@ export class DB {
                 await TABLE_MODEL_2.create({ data: { ...dataTable2, [foreignName]: STORED_TABLE_1.id } });
 
                 return Object.values(await this.table(table1).with([table2]).where('id', STORED_TABLE_1.id).get<any>())[0];
+            });
+        } catch (error: any) {
+            return PrismaErrorHandler.error(error);
+        }
+    }
+
+    static async NonRelationalTransaction(table1: string, dataTable1: object, table2: string, dataTable2: object): Promise<any> {
+        try {
+            // Validar si las tablas existen en el cliente de Prisma
+            if (!PRISMA.hasOwnProperty(table1) || !PRISMA.hasOwnProperty(table2)) {
+                return { error: 'One or both of the provided table names are not valid.', valid: false };
+            }
+
+            // BEFORE ENTER IN THE TRANSACTION MAKE VALIDATION
+            const VALIDATION_MODEL1 = await this.validateRules((PRISMA as any)[table1], dataTable1);
+            if (!VALIDATION_MODEL1.valid) return { error: `${VALIDATION_MODEL1.error}` }
+
+            const VALIDATION_MODEL2 = await this.validateRules((PRISMA as any)[table2], dataTable2);
+            if (!VALIDATION_MODEL2.valid) return { error: `${VALIDATION_MODEL2.error}` }
+
+            return await PRISMA.$transaction(async (tx) => {
+                const TABLE_MODEL_1 = (tx as any)[table1];
+                const TABLE_MODEL_2 = (tx as any)[table2];
+
+                await TABLE_MODEL_1.create({ data: dataTable1 });
+                await TABLE_MODEL_2.create({ data: dataTable2 });
+
+                return { success: true };
             });
         } catch (error: any) {
             return PrismaErrorHandler.error(error);

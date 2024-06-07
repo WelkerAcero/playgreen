@@ -49,11 +49,11 @@ model Users {
 }
 
 model BankAccounts {
-  id               Int     @id @default(autoincrement())
-  available_amount Decimal @db.Decimal(6, 4)
-
-  Users   Users @relation(fields: [user_id], references: [id])
-  user_id Int   @unique
+  id             Int     @id @default(autoincrement())
+  amount         Decimal @db.Decimal(6, 4)
+  account_number String  @unique @db.VarChar(11)
+  Users          Users   @relation(fields: [user_id], references: [id])
+  user_id        Int     @unique
 }
 
 model Roles {
@@ -143,10 +143,14 @@ model Bets {
   status     String  @default("active") // active, cancelled, settled
   result     String? // won, lost
 
-  event    Events @relation(fields: [event_id], references: [id])
+  Events   Events @relation(fields: [event_id], references: [id])
   event_id Int
 
-  Teams             Teams               @relation(fields: [team_id], references: [id])
-  team_id           Int
+  Teams   Teams @relation(fields: [team_id], references: [id])
+  team_id Int
+
   UsersTransactions UsersTransactions[]
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 }
