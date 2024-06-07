@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import { DB } from './DB';
 import { Model } from '../Models/Model';
 import { ROLES_PERMISSIONS_TYPE, USER_TYPE } from '../../config/dataStructure/structure';
 import dotenv from "dotenv";
@@ -27,20 +26,16 @@ export class JWT {
         JWT.user = USER;
         // Envia la info del usuario al model
         Model.setUser(USER);
-        //recuperar datos del administrador autenticado.
-        const ADMIN_PERMISSIONS = await DB.table('Users').with([{
-            Roles: { include: { RolesPermissions: { include: { Permissions: true } }, } }
-        }]).where('id', USER.id).get<USER_TYPE>();
 
         /* Recorrer y extraer todo los permisos y compararlo con el que necesita */
-        ADMIN_PERMISSIONS[0].Roles!.RolesPermissions!.forEach((obj: ROLES_PERMISSIONS_TYPE) => {
+        USER.Roles?.RolesPermissions!.forEach((obj: ROLES_PERMISSIONS_TYPE) => {
             permissions.push(obj.Permissions!.type);
         });
 
         let validationRes: boolean = true;
-        if (typeof (permissionNeeded) == 'string') if (!permissions.includes(permissionNeeded)) validationRes = false;
+        if (typeof (permissionNeeded) === 'string') if (!permissions.includes(permissionNeeded)) validationRes = false;
         if (Array.isArray(permissionNeeded)) permissionNeeded.forEach(permission => { if (!permissions.includes(permission)) validationRes = false; });
-
+        
         return validationRes;
     }
 
