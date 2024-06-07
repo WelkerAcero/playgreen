@@ -1,7 +1,7 @@
 import { Model } from "./Model";
 
 export class UserModel extends Model {
-  private targetDbTable: any = this.prisma.users;
+  private targetDbTable: any = this.prismaClient.users;
   public allowedFields: string[] = [
     'id', 'documentId', 'name', 'lastname', 'cellphone', 'email', 'address', 'gender', 'birthDate',
     'city', 'username', 'password', 'role_id', 'country_id', 'remember_token'

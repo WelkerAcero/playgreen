@@ -1,7 +1,7 @@
 import { Model } from "./Model";
 
 export class PermissionModel extends Model {
-  private targetDbTable: any = this.prisma.permissions;
+  private targetDbTable: any = this.prismaClient.permissions;
   public allowedFields: string[] = ['id', 'type'];
   public allowedRules: object = {
     'type': { type: 'string', max: 20 },

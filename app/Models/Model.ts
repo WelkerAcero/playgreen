@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { VALIDATION_TYPE, USER_TYPE } from '../../config/dataStructure/structure';
 import { InputHandler } from '../../config/inputHandler/ValidateInputs';
 import { PrismaErrorHandler } from '../../config/PrismaErrorHandler';
@@ -14,7 +14,9 @@ export class Model {
   private dbTable: any;
 
   public static user: USER_TYPE;
-  protected prisma: PrismaClient = PRISMA
+
+  protected prisma = Prisma;
+  protected prismaClient: PrismaClient = PRISMA;
   protected relation: string[] | string = '';
 
   constructor() {

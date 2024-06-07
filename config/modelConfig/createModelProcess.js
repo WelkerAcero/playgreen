@@ -24,7 +24,7 @@ const CREAR_MODELO = async (modelNameParam) => {
         if (modelNameParam != '') {
             template = `import { Model } from "./Model";
                 export class ${model} extends Model {
-                    private targetDbTable: any = this.prisma.${table};
+                    private targetDbTable: any = this.prismaClient.${table};
                     private allowedFields: string[] = [];
                     private allowedRules: object = {
                         'param1': { type: 'string', max: 10, min: 8 },

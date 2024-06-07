@@ -50,7 +50,7 @@ model Users {
 
 model BankAccounts {
   id             Int     @id @default(autoincrement())
-  amount         Decimal @db.Decimal(6, 4)
+  amount         Decimal @db.Decimal(19, 4)
   account_number String  @unique @db.VarChar(11)
   Users          Users   @relation(fields: [user_id], references: [id])
   user_id        Int     @unique
@@ -98,7 +98,7 @@ model Categories {
 model UsersTransactions {
   id Int @id @default(autoincrement())
 
-  amount_money Decimal @db.Decimal(6, 4)
+  amount_money Decimal @db.Decimal(19, 4)
 
   Users   Users @relation(fields: [user_id], references: [id])
   user_id Int

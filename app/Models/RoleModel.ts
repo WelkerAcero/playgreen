@@ -1,7 +1,7 @@
 import { Model } from "./Model";
 
 export class RoleModel extends Model {
-  private targetDbTable: any = this.prisma.roles;
+  private targetDbTable: any = this.prismaClient.roles;
   public allowedFields: string[] = ['id', 'rol_name'];
   public allowedRules: object = {'rol_name': { type: 'string', max: 30 },}
 

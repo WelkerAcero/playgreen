@@ -7,12 +7,23 @@ export class InputHandler {
         if (typeof validation == 'object') {
             for (const key in data) {
                 const RULE: RULE_TYPE = validation[key];
-                /* Validación de campos para pacientes y sirve para otros que contengan el mismo nombre de parámetro */
+                /* Validación de campos para Users */
                 if (key == 'documentId') if (!this.onlyNumbers(data[key], RULE)) return { error: this.message(`"Cédula" debe estar entre ${RULE.min} a ${RULE.max} números`), valid: false };
                 if (key == 'name') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Nombre", no debe contener caracteres inválidos y debe tener una longitud máxima de ${RULE.max}`), valid: false };
                 if (key == 'lastname') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Apellido", no debe contener caracteres inválidos y debe tener una longitud máxima de ${RULE.max}`), valid: false };
                 if (key == 'email') if (!this.email(data[key], RULE)) return { error: this.message('Email contiene caracteres inválidos'), valid: false };
-                if (key == 'cellphone') if (!this.onlyNumbers(data[key], RULE)) return { error: this.message(`"Celular" debe ser igual a ${RULE.min}`), valid: false };
+                if (key == 'cellphone') if (!this.onlyNumbers(data[key], RULE)) return { error: this.message(`"Celular"`), valid: false };
+                if (key == 'address') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Dirección"`), valid: false };
+                if (key == 'gender') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Género"`), valid: false };
+                if (key == 'birthDate') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Fecha de nacimiento"`), valid: false };
+                if (key == 'city') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Ciudad"`), valid: false };
+                if (key == 'username') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Nombre de usuario"`), valid: false };
+                if (key == 'password') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Clave o contraseña"`), valid: false };
+
+
+                   /* Validación de campos para Transacciones */
+                if (key == 'amount') if (!this.onlyDecimalNumbers(data[key], RULE)) return { error: this.message(`"amount"`), valid: false };
+                if (key == 'amount_money') if (!this.onlyDecimalNumbers(data[key], RULE)) return { error: this.message(`"amount"`), valid: false };
             }
         }
         return { error: '', valid: true };
@@ -27,20 +38,12 @@ export class InputHandler {
         }
         return { error: '', valid: true };
     }
-
     
     //////////////////////////// VALUES VALIDATION ////////////////////////////////////////////
     static email(field: string, rule: RULE_TYPE): boolean {
         if (rule.default && rule.default == 'empty') return true;
         if (!(rule.type == typeof field)) return false;
         const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
-        return regex.test(field);
-    }
-
-    static bloodPressure(field: string, rule: RULE_TYPE): boolean {
-        if (rule.default && rule.default == 'empty') return true;
-        if (!(rule.type == typeof field)) return false;
-        const regex = /^\d{1,3}\/\d{1,3}$/
         return regex.test(field);
     }
 
