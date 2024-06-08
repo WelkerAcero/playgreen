@@ -13,7 +13,7 @@ export class BetController extends BetModel {
       if (!(await JWT.validatePermission(req.headers.authorization, 'BET-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
-      return res.status(200).json(await this.all());
+      return res.status(200).json(await this.with(['Teams', { Events: { include: { Sports: true } } }]).get());
 
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
@@ -30,6 +30,45 @@ export class BetController extends BetModel {
       const ID: number = parseInt(req.params.id);
       return res.status(200).json(await this.where('id', ID).get());
 
+    } catch (error) {
+      return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
+    }
+  }
+
+  getBetByStatus = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'BET-READ'))) {
+        return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
+      }
+
+      const STATUS: string = req.params.status;
+      return res.status(200).json(await this.with(['Teams', {
+        Events: { include: { Sports: true } },
+      }]).where('status', STATUS).get());
+
+    } catch (error) {
+      return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
+    }
+  }
+
+  getBetByTeam = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'BET-READ'))) {
+        return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
+      }
+
+      const TEAM: string = req.params.team.toString();
+      return res.status(200).json(await this.with([
+        {
+          where: {
+            Teams: {
+              name: TEAM,
+            },
+          },
+          Teams: true,
+          Events: true,
+        }
+      ]).get());
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
     }
@@ -52,13 +91,12 @@ export class BetController extends BetModel {
     }
   }
 
-  makeBet = async (req: Request, res: Response): Promise<Response | any> => {
+  makeBet = async (req: Request, res: Response): Promise<Response> => {
     try {
       if (!(await JWT.validatePermission(req.headers.authorization, 'MAKE-BET'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
-      console.log("REQ.BODY:", req.body);
       let result: COMPLETED_TRANSACTION_TYPE[] = [];
       const DATA: BANK_ACCOUNTS_TYPE[] = req.body;
 
@@ -70,11 +108,11 @@ export class BetController extends BetModel {
         if (DEPOSIT < 0) return res.status(409).json({ error: { message: `${ERROR_MESSAGES.INCORRECT_WITHDRAW_AMOUNT}` } });
 
         const ACCOUNT = Object.values(await DB.table('BankAccounts').where('account_number', ELEMENT.account_number).where('user_id', ELEMENT.user_id).get<BANK_ACCOUNTS_TYPE>())[0];
-        if (!ACCOUNT) return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BANK_ACCOUNT_DOESNT_EXIST}` } });
+        if (!ACCOUNT) return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BANK_ACCOUNT_DOESNT_EXIST}, User account: ${ELEMENT.account_number}` } });
 
         const TO_BET = new Decimal(ELEMENT.amount);
         if (new Decimal(ACCOUNT.amount).lessThan(TO_BET)) {
-          return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BANK_INSUFFICIENT_FUNDS}` } });
+          return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BANK_INSUFFICIENT_FUNDS}. User Account: ${ELEMENT.account_number}, Bet Option: ${ELEMENT.bet_option}` } });
         }
 
         // Verificar si la opción de apuesta esta disponible en el cuerpo de la petición
@@ -82,8 +120,8 @@ export class BetController extends BetModel {
 
         const BET_DATA = await this.where('bet_option', ELEMENT.bet_option).get<BETS_TYPE>();
         if (BET_DATA.length < 1) return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BET_DOESNT_EXIST}` } });
-        if (BET_DATA[0].status !== 'active' ) return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BET_NOT_VALID_NOW}` } });
-        
+        if (BET_DATA[0].status !== 'active') return res.status(409).json({ error: { message: `${ERROR_MESSAGES.BET_NOT_VALID_NOW}` } });
+
         // Conversión y resta
         const CURRENT_BALANCE = new Decimal(ACCOUNT.amount);
         const NEW_AMOUNT = CURRENT_BALANCE.minus(TO_BET);
@@ -105,7 +143,8 @@ export class BetController extends BetModel {
         result.push(STORE);
       }
 
-      return res.status(204).json(result);
+      return res.status(201).json(result);
+
     } catch (error: any) {
       return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
     }

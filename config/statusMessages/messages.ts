@@ -21,7 +21,7 @@ export const ERROR_MESSAGES = {
   BET_OPTION_ERROR: "No se pudo procesar la opción de apuesta. Vuelva a intentar",
   BET_DOESNT_EXIST: "La opción seleccionada para la apuesta no existe. Intente nuevamente con una opción válida",
   BET_NOT_VALID_NOW: "La opción seleccionada para la apuesta no se encuentra disponible",
-  BANK_ACCOUNT_DOESNT_EXIST: "El número de cuenta no existe, trata de ingresar una cuenta válida de tu usuario o crea una cuenta de banco a tu usuario",
+  BANK_ACCOUNT_DOESNT_EXIST: "El número de cuenta no existe, ingresa una cuenta válida",
   BANK_INSUFFICIENT_FUNDS: "Fondos insuficientes",
 };
 
