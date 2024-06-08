@@ -17,6 +17,10 @@ export const ERROR_MESSAGES = {
   INVALID_DATE: "La fecha ingresada es menor a la actual, por favor asegurese de ingresar una fecha valida",
   INCORRECT_DEPOSIT_AMOUNT: "El valor del monto a depositar no pueden ser valores negativos. Intente nuevamente",
   INCORRECT_WITHDRAW_AMOUNT: "El valor del a retirar debe ser mayor a 0. Intente nuevamente",
+  INCORRECT_BET_AMOUNT: "El de la apuesta debe ser mayor a 0. Intente nuevamente",
+  BET_OPTION_ERROR: "No se pudo procesar la opción de apuesta. Vuelva a intentar",
+  BET_DOESNT_EXIST: "La opción seleccionada para la apuesta no existe. Intente nuevamente con una opción válida",
+  BET_NOT_VALID_NOW: "La opción seleccionada para la apuesta no se encuentra disponible",
   BANK_ACCOUNT_DOESNT_EXIST: "El número de cuenta no existe, trata de ingresar una cuenta válida de tu usuario o crea una cuenta de banco a tu usuario",
   BANK_INSUFFICIENT_FUNDS: "Fondos insuficientes",
 };

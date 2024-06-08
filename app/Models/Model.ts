@@ -458,34 +458,43 @@ export class Model {
     }
   }
 
+  /**
+ * Función que recibe tablas como llaves y datos
+ * @param {string} table1 nombre de la tabla 1 de la base de datos
+ * @param {string} table2 nombre de la tabla 2 de la base de datos
+ * @param {object} dataTable1 recibe los datos de la tabla 1 
+ * @param {object} updateData recibe los datos de la tabla 2 que fueron actualizados en el proceso
+ * @param {string} updateField Recibe el nombre de la columna con el cual actualizaremos los datos de la tabla 2
+ * @returns {object} devuelve el registro de la transacción y la información resultante de la cuenta del usuario
+  */
   protected async storeAndUpdateTransaction(table1: string, dataTable1: object, table2: string, updateData: object, updateField: string): Promise<any> {
     try {
       // Validar si las tablas existen en el cliente de Prisma
       if (!PRISMA.hasOwnProperty(table1) || !PRISMA.hasOwnProperty(table2)) {
         return { error: 'One or both of the provided table names are not valid.', valid: false };
       }
-  
+
       // BEFORE ENTER IN THE TRANSACTION MAKE VALIDATION
       const VALIDATION_MODEL1 = await this.validateRules((PRISMA as any)[table1], dataTable1);
       if (!VALIDATION_MODEL1.valid) return { error: `${VALIDATION_MODEL1.error}` }
 
       const VALIDATION_MODEL2 = await this.validateRules((PRISMA as any)[table2], updateData);
       if (!VALIDATION_MODEL2.valid) return { error: `${VALIDATION_MODEL2.error}` }
-  
+
       return await PRISMA.$transaction(async (tx) => {
         const TABLE_MODEL_1 = (tx as any)[table1];
         const TABLE_MODEL_2 = (tx as any)[table2];
-  
+
         const STORE = await TABLE_MODEL_1.create({ data: dataTable1 });
         const UPDATE = await TABLE_MODEL_2.update({
           where: { [updateField]: (updateData as any)[updateField] },
           data: updateData
         });
-  
-        return { 
+
+        return {
           [table1]: STORE,
           [table2]: UPDATE
-         };
+        };
       });
     } catch (error: any) {
       return PrismaErrorHandler.error(error);

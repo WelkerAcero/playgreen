@@ -29,6 +29,12 @@ export type BANK_ACCOUNTS_TYPE = {
     account_number: string,
     amount: string,
     user_id: number,
+    bet_option?: number,
+}
+
+export type COMPLETED_TRANSACTION_TYPE = {
+    UsersTransactions: USERS_TRANSACTIONS_TYPE,
+    BankAccounts: BANK_ACCOUNTS_TYPE
 }
 
 export type USERS_TRANSACTIONS_TYPE = {

@@ -138,7 +138,7 @@ model Teams {
 
 model Bets {
   id         Int     @id @default(autoincrement())
-  bet_option Int
+  bet_option Int     @unique
   odd        Float
   status     String  @default("active") // active, cancelled, settled
   result     String? // won, lost
