@@ -183,7 +183,7 @@ export class BetController extends BetModel {
 
         for (let i = 0; i < WINNER_USERS.length; i++) {
           const ELEMENT = WINNER_USERS[i];
-          const BET_ODD = new Decimal(ELEMENT.odd.toString());
+          const BET_ODD = new Decimal(ELEMENT.odd);
           const USER_AMOUNT = new Decimal(ELEMENT.UsersTransactions!.amount_money);
 
           // Multiply
