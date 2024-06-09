@@ -1,7 +1,7 @@
 import { DB } from "./DB";
 
 export class CodeGenerator {
-    private static generateRandomString(length: number): string {
+    static generateRandomString(length: number): string {
         const allowedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         const excludedCharacters = "()*/$%&{}´´[]``-_.";
         const characters = allowedCharacters.split("").filter(char => !excludedCharacters.includes(char));
@@ -15,7 +15,7 @@ export class CodeGenerator {
         return result;
     }
 
-    static setCode = async (table: string, columName: string, length: number): Promise<string> => {
+/*     static setCode = async (table: string, columName: string, length: number): Promise<string> => {
         const RANDOM_STRING: string = this.generateRandomString(100);
         const codeLength = length; // Longitud del código deseado
         let code: string = '';
@@ -31,5 +31,5 @@ export class CodeGenerator {
         } while (repeat);
 
         return code;
-    }
+    } */
 }

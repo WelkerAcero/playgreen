@@ -132,7 +132,7 @@ model Events {
 
 model Teams {
   id   Int    @id @default(autoincrement())
-  name String @unique
+  name String @db.VarChar(50) @unique
   Bets Bets[]
 }
 

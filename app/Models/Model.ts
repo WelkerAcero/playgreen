@@ -143,7 +143,6 @@ export class Model {
 
       this._whereCondition = {};
       this._withRelation = {};
-      console.log('OPTIONS:', options);
       return await this.dbTable.findMany(options);
 
     } catch (error: any) {

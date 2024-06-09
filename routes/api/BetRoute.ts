@@ -11,5 +11,6 @@ router.get("/bet/get/team/:team", CONTROLLER.getBetByTeam);
 
 router.post("/bet/create", CONTROLLER.createNewBet);
 router.post("/bet/make-bet", CONTROLLER.makeBet);
+router.put("/bet/update/:id", CONTROLLER.updateBetStatus);
 
 export default router;

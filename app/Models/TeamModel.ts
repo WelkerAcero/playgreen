@@ -1,9 +1,8 @@
 import { Model } from "./Model";
-
-export class PermissionModel extends Model {
-  private targetDbTable: any = this.prismaClient.permissions;
-  public allowedFields: string[] = ['id', 'type'];
-  public allowedRules: object = { 'type': { type: 'string', max: 20 } }
+export class TeamModel extends Model {
+  private targetDbTable: any = this.prismaClient.teams;
+  private allowedFields: string[] = ['id', 'name'];
+  private allowedRules: object = { 'name': { type: "string", max: 50 } };
 
   constructor() {
     super();

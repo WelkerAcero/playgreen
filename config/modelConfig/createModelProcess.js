@@ -14,7 +14,7 @@ const CREAR_MODELO = async (modelNameParam) => {
                 modelNameParam = strSinY + 'ie'
             }
             //return modelNameParam[0].toUpperCase() + modelNameParam.slice(1).concat('s');
-            return modelNameParam[0] + modelNameParam.slice(1).concat('s');
+            return modelNameParam[0].toLowerCase() + modelNameParam.slice(1).concat('s');
         }
 
         model = getModelName(modelNameParam);

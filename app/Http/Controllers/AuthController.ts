@@ -8,6 +8,7 @@ import { EmailProvider } from "../../Providers/EmailProvider";
 import { USER_TYPE } from "../../../config/dataStructure/structure";
 import { PasswordHandler } from '../../../config/inputHandler/PasswordHandler';
 import { DataOrganizer } from "../../helpers/DataOrganizer";
+import { CodeGenerator } from "../../helpers/CodeGenerator";
 
 export class AuthController extends UserModel {
     private loginAttemptsByUser: Map<string, number> = new Map<string, number>();
@@ -151,16 +152,8 @@ export class AuthController extends UserModel {
     }
 
     setRememberPasswordToken = async (user: USER_TYPE): Promise<USER_TYPE> => {
-        const characters = '!#*$A/*{B*C#}*DE*!{F*G#}*H$*{I*J#}*KL*{M*N#}/*O!P*{Q*R#}*ST*{U*$#}*V!W*{X*Y#}*Z0*{1*$!#}*23*{4*5#}*6$*{7!*8#}!*9#/!';
-        const codeLength = 50; // Longitud del código deseado
-        let code: string = '';
-
-        for (let i = 0; i < codeLength; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            code += characters[randomIndex];
-        }
-
-        user.remember_token = code;
+        const CODE: string = CodeGenerator.generateRandomString(10);
+        user.remember_token = CODE;
         delete user.updatedAt; delete user.createdAt;
         return user;
     }

@@ -51,7 +51,7 @@ export type USERS_TRANSACTIONS_TYPE = {
     updatedAt?: Date,
 }
 
-export type SPORT_TYPE = {
+export type SPORTS_TYPE = {
     id: number,
     name: string,
     Events?: EVENTS_TYPE
@@ -64,7 +64,7 @@ export type EVENTS_TYPE = {
     event_date: Date
     sport_id: number,
 
-    Sports?: SPORT_TYPE,
+    Sports?: SPORTS_TYPE,
     Bets?: BETS_TYPE
 }
 

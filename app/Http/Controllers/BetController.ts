@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { BetModel } from "../../Models/BetModel";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../../../config/statusMessages/messages";
 import { JWT } from "../../helpers/JWT";
-import { BANK_ACCOUNTS_TYPE, BETS_TYPE, COMPLETED_TRANSACTION_TYPE, USERS_TRANSACTIONS_TYPE } from "../../../config/dataStructure/structure";
+import { BANK_ACCOUNTS_TYPE, BETS_TYPE, COMPLETED_TRANSACTION_TYPE, USERS_TRANSACTIONS_TYPE, USER_TYPE } from "../../../config/dataStructure/structure";
 import { DB } from "../../helpers/DB";
 
 export class BetController extends BetModel {
@@ -42,9 +42,11 @@ export class BetController extends BetModel {
       }
 
       const STATUS: string = req.params.status;
-      return res.status(200).json(await this.with(['Teams', {
-        Events: { include: { Sports: true } },
-      }]).where('status', STATUS).get());
+      return res.status(200).json(await this.with(['Teams',
+        {
+          Events: { include: { Sports: true } },
+        }
+      ]).where('status', STATUS).get());
 
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
@@ -58,17 +60,15 @@ export class BetController extends BetModel {
       }
 
       const TEAM: string = req.params.team.toString();
-      return res.status(200).json(await this.with([
-        {
-          where: {
-            Teams: {
-              name: TEAM,
-            },
-          },
-          Teams: true,
-          Events: true,
-        }
-      ]).get());
+      return res.status(200).json(
+        await this.with(
+          [
+            {
+              Teams: true,
+              Events: { include: { Sports: true } }
+            }
+          ]
+        ).buildWhere({ Teams: { name: TEAM } }).get());
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
     }
@@ -144,6 +144,32 @@ export class BetController extends BetModel {
       }
 
       return res.status(201).json(result);
+
+    } catch (error: any) {
+      return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
+    }
+  };
+
+
+  updateBetStatus = async (req: Request, res: Response): Promise<any> => {
+    try {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'BET-UPDATE'))) {
+        return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
+      }
+
+      const BET_ID: number = parseInt(req.params.id);
+      const DATA: BETS_TYPE = req.body;
+      let winners!: USER_TYPE;
+
+      if (DATA.result && DATA.result === 'WON') {
+
+        const WINNER_USERS = await this.with([{
+          UsersTransactions: { include: { Users: { include: { BankAccounts: true } } } }
+        }]).where('id', DATA.id).get<BETS_TYPE>();
+
+        const EVENT_BET_RELATIONED = this.where('event_id', DATA.event_id).get<BETS_TYPE>();
+        return res.status(200).json({ winners: WINNER_USERS, event_relationed: EVENT_BET_RELATIONED });
+      }
 
     } catch (error: any) {
       return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
