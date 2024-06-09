@@ -77,7 +77,7 @@ export type TEAMS_TYPE = {
 export type BETS_TYPE = {
     id: number,
     bet_option: number,
-    odd: number,
+    odd: string,
     status: string,
     result?: string, /* WON | LOST */
     event_id: number,

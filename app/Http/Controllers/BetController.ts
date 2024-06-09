@@ -156,21 +156,44 @@ export class BetController extends BetModel {
       if (!(await JWT.validatePermission(req.headers.authorization, 'BET-UPDATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
-
+      
+      console.log('REQ:', req.body);
       const BET_ID: number = parseInt(req.params.id);
       const DATA: BETS_TYPE = req.body;
-      let winners!: USER_TYPE;
+      let winners: { to_deposit: Decimal, account_number: string }[] = [];
 
       if (DATA.result && DATA.result === 'WON') {
 
         const WINNER_USERS = await this.with([{
-          UsersTransactions: { include: { Users: { include: { BankAccounts: true } } } }
-        }]).where('id', DATA.id).get<BETS_TYPE>();
+          UsersTransactions: {
+            select: {
+              user_id: true, amount_money: true,
+              Categories: { select: { name: true } },
+              Users: {
+                select: {
+                  name: true, lastname: true, cellphone: true, email: true, gender: true,
+                  BankAccounts: {
+                    select: { account_number: true }
+                  }
+                }
+              }
+            }
+          }
+        }]).where('id', BET_ID).get<BETS_TYPE>();
 
-        const EVENT_BET_RELATIONED = this.where('event_id', DATA.event_id).get<BETS_TYPE>();
-        return res.status(200).json({ winners: WINNER_USERS, event_relationed: EVENT_BET_RELATIONED });
+        for (let i = 0; i < WINNER_USERS.length; i++) {
+          const ELEMENT = WINNER_USERS[i];
+          const BET_ODD = new Decimal(ELEMENT.odd.toString());
+          const USER_AMOUNT = new Decimal(ELEMENT.UsersTransactions!.amount_money);
+
+          // Multiply
+          const MONEY_EARNED = USER_AMOUNT.mul(BET_ODD);
+          console.log('MONEY EARNED:', MONEY_EARNED);
+          winners.push({ to_deposit: MONEY_EARNED, account_number: ELEMENT.UsersTransactions!.Users!.BankAccounts.account_number })
+        }
       }
 
+      return res.status(200).json(winners);
     } catch (error: any) {
       return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
     }

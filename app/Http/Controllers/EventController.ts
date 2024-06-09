@@ -8,7 +8,7 @@ export class EventController extends EventModel {
 
   getEvents = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENTS-READ'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENT-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -21,7 +21,7 @@ export class EventController extends EventModel {
 
   getEvent = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENTS-READ'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENT-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -35,7 +35,7 @@ export class EventController extends EventModel {
 
   storeEvent = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENTS-CREATE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENT-CREATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -52,7 +52,7 @@ export class EventController extends EventModel {
 
   updateEvent = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENTS-UPDATE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENT-UPDATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -71,7 +71,7 @@ export class EventController extends EventModel {
 
   deleteEvent = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENTS-DELETE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'EVENT-DELETE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 

@@ -8,7 +8,7 @@ export class TeamController extends TeamModel {
 
   getTeams = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAMS-READ'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAM-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -21,7 +21,7 @@ export class TeamController extends TeamModel {
 
   getTeam = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAMS-READ'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAM-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -35,7 +35,7 @@ export class TeamController extends TeamModel {
 
   storeTeam = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAMS-CREATE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAM-CREATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -52,7 +52,7 @@ export class TeamController extends TeamModel {
 
   updateTeam = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAMS-UPDATE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAM-UPDATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -72,7 +72,7 @@ export class TeamController extends TeamModel {
   
   deleteTeam = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAMS-DELETE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'TEAM-DELETE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 

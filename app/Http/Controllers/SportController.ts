@@ -8,7 +8,7 @@ export class SportController extends SportModel {
 
   getSports = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORTS-READ'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORT-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -21,7 +21,7 @@ export class SportController extends SportModel {
 
   getSport = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORTS-READ'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORT-READ'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -35,7 +35,7 @@ export class SportController extends SportModel {
 
   storeSport = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORTS-CREATE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORT-CREATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
@@ -52,7 +52,7 @@ export class SportController extends SportModel {
 
   updateSport = async (req: Request, res: Response): Promise<Response> => {
     try {
-      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORTS-UPDATE'))) {
+      if (!(await JWT.validatePermission(req.headers.authorization, 'SPORT-UPDATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
 
