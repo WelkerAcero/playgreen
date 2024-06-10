@@ -5,7 +5,7 @@ until mysqladmin ping -hroundhouse.proxy.rlwy.net --port 53007 --silent; do
 done
 
 # Importar datos SQL
-mysql -hroundhouse.proxy.rlwy.net -uroot -pfTgxaNxXNWwArAMqWhpAeFkUjiTSWJJY --port 53007 --protocol=TCP railway < /app/Database/sportsbook.sql
+mysql -hroundhouse.proxy.rlwy.net -uroot -pWzhtCumcySkEIfcqHLGuwdIJxIziqbEW --port 16637 --protocol=TCP railway < /app/Database/sportsbook.sql
 
 # Iniciar la aplicación
 npm run start
