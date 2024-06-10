@@ -3,7 +3,6 @@ import response_time from "response-time";
 import cors from "cors";
 import cookieParser from 'cookie-parser';
 import BodyParser from "body-parser";
-import http from 'http';
 import dotenv from "dotenv";
 dotenv.config();
 
