@@ -85,7 +85,7 @@ export type BETS_TYPE = {
 
     Events?: EVENTS_TYPE,
     Teams?: TEAMS_TYPE,
-    UsersTransactions?: USERS_TRANSACTIONS_TYPE,
+    UsersTransactions?: USERS_TRANSACTIONS_TYPE[],
 
     createdAt?: Date,
     updatedAt?: Date

@@ -28,7 +28,7 @@ export class BetController extends BetModel {
       }
 
       const ID: number = parseInt(req.params.id);
-      return res.status(200).json(await this.where('id', ID).get());
+      return res.status(200).json(await this.with(['Teams', { Events: { include: { Sports: true } } }]).where('id', ID).get());
 
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);
@@ -156,24 +156,28 @@ export class BetController extends BetModel {
       if (!(await JWT.validatePermission(req.headers.authorization, 'BET-UPDATE'))) {
         return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
       }
-      
-      console.log('REQ:', req.body);
+
+      let winners: { to_deposit: Decimal, current_balance: Decimal, account_number: string, user_id: number, bet_id: number }[] = [];
+      let result: COMPLETED_TRANSACTION_TYPE[] = [];
+
       const BET_ID: number = parseInt(req.params.id);
       const DATA: BETS_TYPE = req.body;
-      let winners: { to_deposit: Decimal, account_number: string }[] = [];
+
+      const UPDATE = await this.update(BET_ID, DATA);
+      if (UPDATE?.error) return res.status(409).json({ error: { message: UPDATE.error } });
 
       if (DATA.result && DATA.result === 'WON') {
 
         const WINNER_USERS = await this.with([{
           UsersTransactions: {
             select: {
-              user_id: true, amount_money: true,
+              user_id: true, amount_money: true, bet_id: true,
               Categories: { select: { name: true } },
               Users: {
                 select: {
                   name: true, lastname: true, cellphone: true, email: true, gender: true,
                   BankAccounts: {
-                    select: { account_number: true }
+                    select: { account_number: true, amount: true }
                   }
                 }
               }
@@ -181,19 +185,52 @@ export class BetController extends BetModel {
           }
         }]).where('id', BET_ID).get<BETS_TYPE>();
 
-        for (let i = 0; i < WINNER_USERS.length; i++) {
-          const ELEMENT = WINNER_USERS[i];
-          const BET_ODD = new Decimal(ELEMENT.odd);
-          const USER_AMOUNT = new Decimal(ELEMENT.UsersTransactions!.amount_money);
+        const BET_ODD = new Decimal(WINNER_USERS[0].odd);
+
+        for (let i = 0; i < WINNER_USERS[0].UsersTransactions!.length; i++) {
+
+          const ELEMENT = WINNER_USERS[0].UsersTransactions![i];
+          const USER_AMOUNT_INVESTED = new Decimal(ELEMENT.amount_money);
+          const USER_CURRENT_BALANCE = new Decimal(ELEMENT.Users!.BankAccounts.amount);
 
           // Multiply
-          const MONEY_EARNED = USER_AMOUNT.mul(BET_ODD);
-          console.log('MONEY EARNED:', MONEY_EARNED);
-          winners.push({ to_deposit: MONEY_EARNED, account_number: ELEMENT.UsersTransactions!.Users!.BankAccounts.account_number })
+          const MONEY_EARNED = USER_AMOUNT_INVESTED.mul(BET_ODD);
+          winners.push(
+            {
+              to_deposit: MONEY_EARNED,
+              current_balance: USER_CURRENT_BALANCE,
+              account_number: ELEMENT.Users!.BankAccounts.account_number,
+              user_id: ELEMENT.user_id,
+              bet_id: ELEMENT.bet_id!
+            }
+          );
+        }
+
+        console.log('Ganadores:', winners);
+
+        for (let i = 0; i < winners.length; i++) {
+          const ELEMENT = winners[i];
+
+          /* Sum the new quantity on the account for this user account iteration */
+          const BALANCE_UPDATED = {
+            account_number: ELEMENT.account_number,
+            amount: ELEMENT.current_balance.plus(ELEMENT.to_deposit).toFixed(4)
+          };
+
+          const TRANSACTION: USERS_TRANSACTIONS_TYPE = {
+            amount_money: ELEMENT.to_deposit.toFixed(4),
+            user_id: ELEMENT.user_id,
+            category_id: 4,
+            bet_id: ELEMENT.bet_id
+          }
+
+          const STORE = await this.storeAndUpdateTransaction('UsersTransactions', TRANSACTION, 'BankAccounts', BALANCE_UPDATED, 'account_number');
+          if (STORE?.error) return res.status(409).json({ error: { message: `${STORE.error}` } });
+
+          result.push(STORE);
         }
       }
-
-      return res.status(200).json(winners);
+      return res.status(200).json(result);
     } catch (error: any) {
       return res.json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
     }
