@@ -1,0 +1,5 @@
+[build]
+  command = "npm install && npm run build && npm run dbgenerate && npm run migrate && npm run build"
+
+[start]
+  command = "npm start"
