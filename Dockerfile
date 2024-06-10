@@ -11,10 +11,14 @@ COPY package*.json ./
 COPY . .
 #COPY docker.env .env
 
+
 # Instalación de dependencias del proyecto
 RUN npm install
 RUN npm run ts-config
 RUN npm run dbgenerate
+
+# Construye la aplicación TypeScript
+RUN npm run build
 
 COPY init_db.sh /app/init_db.sh
 RUN chmod +x /app/init_db.sh
