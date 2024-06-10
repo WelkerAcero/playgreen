@@ -8,7 +8,7 @@ done
 npm run migrate
 
 # Importar datos SQL
-mysql -h roundhouse.proxy.rlwy.net -P 53007 -u root -p fTgxaNxXNWwArAMqWhpAeFkUjiTSWJJY railway < /app/Database/sportsbook.sql
+mysql -hroundhouse.proxy.rlwy.net -uroot -pfTgxaNxXNWwArAMqWhpAeFkUjiTSWJJY --port 53007 --protocol=TCP railway < /app/Database/sportsbook.sql
 
 # Iniciar la aplicación
 npm run start
