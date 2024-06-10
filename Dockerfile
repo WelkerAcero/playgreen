@@ -16,6 +16,7 @@ COPY . .
 RUN npm install
 RUN npm run ts-config
 RUN npm run dbgenerate
+RUN npm run migrate
 
 # Construye la aplicación TypeScript
 RUN npm run build

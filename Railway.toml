@@ -1,5 +1,2 @@
 [build]
-  command = "npm install && npm run dbgenerate && npm run migrate && npm run build && npm run build"
-
-[start]
-  command = "npm start"
+  command = "npm run migrate"
