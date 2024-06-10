@@ -11,4 +11,5 @@ npm run migrate
 mysql -h roundhouse.proxy.rlwy.net -P 53007 -u root -p fTgxaNxXNWwArAMqWhpAeFkUjiTSWJJY railway < /app/Database/sportsbook.sql
 
 # Iniciar la aplicación
+npm run build
 npm run start
