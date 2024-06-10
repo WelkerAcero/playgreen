@@ -9,8 +9,6 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY . .
-#COPY docker.env .env
-
 
 # Instalación de dependencias del proyecto
 RUN npm install

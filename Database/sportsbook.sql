@@ -39,8 +39,8 @@ CREATE TABLE `bankaccounts` (
 --
 
 INSERT INTO `bankaccounts` (`id`, `user_id`, `account_number`, `amount`) VALUES
-(1, 3, '81407234570', '55120.0000'),
-(5, 4, '81432154632', '56800.0000');
+(1, 2, '81407234570', '50000.0000'),
+(5, 3, '81432154632', '50000.0000');
 
 -- --------------------------------------------------------
 
@@ -290,10 +290,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `documentId`, `name`, `lastname`, `cellphone`, `email`, `address`, `gender`, `birthDate`, `city`, `username`, `password`, `remember_token`, `role_id`, `country_id`, `createdAt`, `updatedAt`, `deleted`, `deletedAt`) VALUES
-(1, '1232589088', 'Welker', 'Jose', '3213655354', 'welkerperez97@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'chorizo007', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 1, 1, '2024-06-05 16:32:31.037', '2024-06-05 16:32:31.037', 0, NULL),
-(2, '1232589088', 'Anggie', 'Castellanos', '3118365945', 'anggie@gmail.com', 'Calle 63d', 'F', '1997-12-12', 'Bucaramanga', 'pandefruta@gmail.com', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 1, 1, '2024-06-05 19:37:01.317', '2024-06-05 19:37:01.317', 0, NULL),
-(3, '1232589055', 'Player', 'Jose', '3213655355', 'player@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'tiburonzin', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 2, 1, '2024-06-06 00:12:03.360', '2024-06-06 00:12:03.360', 0, NULL),
-(4, '1123456789', 'edited name', 'edited lastname', '3212565254', 'editedemail@gmail.com', 'Calle 63D #30 - 67', 'M', '1997/03/13', 'Bucaramanga', 'loquillo321', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 2, 1, '2024-06-09 16:17:17.000', '2024-06-10 01:48:14.363', 0, NULL);
+(1, '1232589088', 'Welker', 'Jose', '3213655354', 'welkerperez97@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'salchipapas', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 1, 1, '2024-06-05 16:32:31.037', '2024-06-05 16:32:31.037', 0, NULL),
+(2, '1232589055', 'Player one', 'Jose', '3213655355', 'player_one@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'tiburonzin', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 2, 1, '2024-06-06 00:12:03.360', '2024-06-06 00:12:03.360', 0, NULL),
+(2, '1232528044', 'Player two', 'Jose', '3213655356', 'player_two@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'gatovolador', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 2, 1, '2024-06-06 00:12:03.360', '2024-06-06 00:12:03.360', 0, NULL);
 
 -- --------------------------------------------------------
 
