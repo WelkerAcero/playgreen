@@ -13,15 +13,15 @@ export class InputHandler {
                 if (key == 'lastname') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Apellido", no debe contener caracteres inválidos y debe tener una longitud máxima de ${RULE.max}`), valid: false };
                 if (key == 'email') if (!this.email(data[key], RULE)) return { error: this.message('Email contiene caracteres inválidos'), valid: false };
                 if (key == 'cellphone') if (!this.onlyNumbers(data[key], RULE)) return { error: this.message(`"Celular"`), valid: false };
-                if (key == 'address') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Dirección"`), valid: false };
+                if (key == 'address') if (!this.stringWithSpecialSimbols(data[key], RULE)) return { error: this.message(`"Dirección"`), valid: false };
                 if (key == 'gender') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Género"`), valid: false };
-                if (key == 'birthDate') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Fecha de nacimiento"`), valid: false };
+                if (key == 'birthDate') if (!this.stringWithSpecialSimbols(data[key], RULE)) return { error: this.message(`"Fecha de nacimiento"`), valid: false };
                 if (key == 'city') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Ciudad"`), valid: false };
-                if (key == 'username') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Nombre de usuario"`), valid: false };
-                if (key == 'password') if (!this.letterString(data[key], RULE)) return { error: this.message(`"Clave o contraseña"`), valid: false };
+                if (key == 'username') if (!this.stringWithNumbers(data[key], RULE)) return { error: this.message(`"Nombre de usuario"`), valid: false };
+                if (key == 'password') if (!this.stringWithSpecialSimbols(data[key], RULE)) return { error: this.message(`"Clave o contraseña"`), valid: false };
 
 
-                   /* Validación de campos para Transacciones */
+                /* Validación de campos para Transacciones */
                 if (key == 'amount') if (!this.onlyDecimalNumbers(data[key], RULE)) return { error: this.message(`"amount"`), valid: false };
                 if (key == 'amount_money') if (!this.onlyDecimalNumbers(data[key], RULE)) return { error: this.message(`"amount"`), valid: false };
             }
@@ -38,7 +38,7 @@ export class InputHandler {
         }
         return { error: '', valid: true };
     }
-    
+
     //////////////////////////// VALUES VALIDATION ////////////////////////////////////////////
     static email(field: string, rule: RULE_TYPE): boolean {
         if (rule.default && rule.default == 'empty') return true;
@@ -71,6 +71,14 @@ export class InputHandler {
         return regex.test(field);
     }
 
+    static stringWithSpecialSimbols(field: string, rule: RULE_TYPE): boolean {
+        if (rule.default && rule.default == 'empty') return true;
+        if (typeof (field) !== rule.type) return false;
+        if (rule.min) if (field.length < rule.min) return false;
+        if (rule.max) if (field.length > rule.max) return false;
+        const regex = /^[a-zA-ZÑñ0-9\s.,-@#$%^&*()_+=\[\]{}|;:'"\\<>?/`~!]+$/gi
+        return regex.test(field);
+    }
 
     static onlyNumbers(field: string, rule: RULE_TYPE): boolean {
         if (rule.default && rule.default == 'empty') return true;

@@ -124,7 +124,7 @@ export class AuthController extends UserModel {
                 return res.status(401).json({ error: { message: ERROR_MESSAGES.WRONG_LOGIN_CREDENTIALS } });
             }
 
-            await DataOrganizer.deleteProp([ADMIN], ['id', 'password', 'remember_token']);
+            await DataOrganizer.deleteProp([ADMIN], ['password', 'remember_token']);
             const TOKEN = await JWT.createToken(ADMIN);
 
             /* resetea los intentos para este usuario */

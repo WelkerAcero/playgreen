@@ -31,8 +31,8 @@ export class UserController extends UserModel {
 
             DataOrganizer.deleteProp(USER_LIST,
                 [
-                    'password', 'role_id', 'remember_token', 'Roles.createdAt', 'Roles.updatedAt', 'Roles.id',
-                    'Roles.RolesPermissions.id', 'Roles.RolesPermissions.role_id', 'Roles.RolesPermissions.permission_id',
+                    'documentId', 'cellphone', 'address', 'birthDate', 'gender', 'username', 'password', 'role_id', 'remember_token', 'Roles.createdAt', 
+                    'Roles.updatedAt', 'Roles.id', 'Roles.RolesPermissions.id', 'Roles.RolesPermissions.role_id', 'Roles.RolesPermissions.permission_id',
                     'Roles.RolesPermissions.createdAt', 'Roles.RolesPermissions.updatedAt'
                 ]
             );
@@ -49,14 +49,14 @@ export class UserController extends UserModel {
             const ADMIN_USER: USER_TYPE = await JWT.decodeToken(AUTH_HEADER);
 
             if (!ADMIN_USER) return res.status(401).json({ error: { message: ERROR_MESSAGES.UNAUTHENTICATED } });
-            if (!(await JWT.validatePermission(AUTH_HEADER, 'EDIT-PROFILE'))) return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
+            if (!(await JWT.validatePermission(AUTH_HEADER, 'PROFILE-UPDATE'))) return res.status(401).json({ error: { message: ERROR_MESSAGES.PERMISSIONS_DENIED } })
 
-            req.body.password = ADMIN_USER.password;
-            req.body.email.replace(/\s+/g, '');
+            if (req.body.email) req.body.email.replace(/\s+/g, '');
 
             const SAVE = await this.update(ADMIN_USER.id, req.body);
             if (SAVE.error) return res.status(409).json({ error: { message: `${SAVE.error}` } });
 
+            DataOrganizer.deleteProp([SAVE], ['username', 'password', 'remember_token', 'role_id', 'country_id', 'createdAt', 'updatedAt', 'birthDate'])
             return res.status(200).json(SAVE);
         } catch (error: any) {
             return res.status(400).json({ error: { message: ERROR_MESSAGES.CLIENT_SERVER_ERROR } });
