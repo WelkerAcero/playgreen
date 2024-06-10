@@ -84,7 +84,7 @@ export class BetController extends BetModel {
       const STORE = await this.create(DATA);
 
       if (STORE?.error) return res.status(409).json({ error: { message: STORE.error } });
-      return res.status(204).json(STORE);
+      return res.status(201).json(STORE);
 
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);

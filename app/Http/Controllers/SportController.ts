@@ -43,7 +43,7 @@ export class SportController extends SportModel {
       const STORE = await this.create(DATA);
 
       if (STORE?.error) return res.status(409).json({ error: { message: STORE.error } });
-      return res.status(200).json(STORE);
+      return res.status(201).json(STORE);
 
     } catch (error) {
       return res.status(500).json(ERROR_MESSAGES.CLIENT_SERVER_ERROR);

@@ -3,10 +3,9 @@ import { UserModel } from "../../Models/UserModel";
 import { JWT } from "../../helpers/JWT";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../../../config/statusMessages/messages";
 import { DataOrganizer } from "../../helpers/DataOrganizer";
-import { BANK_ACCOUNTS_TYPE, USER_TYPE } from '../../../config/dataStructure/structure';
+import { USER_TYPE } from '../../../config/dataStructure/structure';
 import { PasswordHandler } from "../../../config/inputHandler/PasswordHandler";
 import { Encrypt } from "../../helpers/ENCRYPT";
-import { DB } from "../../helpers/DB";
 
 export class UserController extends UserModel {
 
