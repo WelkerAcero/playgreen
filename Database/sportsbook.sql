@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-06-2024 a las 18:12:01
+-- Tiempo de generación: 10-06-2024 a las 13:59:33
 -- Versión del servidor: 10.4.25-MariaDB
 -- Versión de PHP: 7.4.30
 
@@ -24,18 +24,50 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `bankaccounts`
+--
+
+CREATE TABLE `bankaccounts` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `account_number` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(19,4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `bankaccounts`
+--
+
+INSERT INTO `bankaccounts` (`id`, `user_id`, `account_number`, `amount`) VALUES
+(1, 3, '81407234570', '55120.0000'),
+(5, 4, '81432154632', '56800.0000');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `bets`
 --
 
 CREATE TABLE `bets` (
   `id` int(11) NOT NULL,
   `bet_option` int(11) NOT NULL,
-  `odd` double NOT NULL,
+  `odd` decimal(5,2) NOT NULL,
   `status` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
   `result` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `event_id` int(11) NOT NULL,
-  `team_id` int(11) NOT NULL
+  `team_id` int(11) NOT NULL,
+  `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updatedAt` datetime(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `bets`
+--
+
+INSERT INTO `bets` (`id`, `bet_option`, `odd`, `status`, `result`, `event_id`, `team_id`, `createdAt`, `updatedAt`) VALUES
+(1, 1, '2.40', 'active', 'WON', 1, 1, '2024-06-08 11:00:11.000', '2024-06-10 00:30:38.995'),
+(2, 2, '2.60', 'active', NULL, 1, 2, '2024-06-08 11:00:57.000', '2024-06-08 11:00:57.000'),
+(4, 3, '4.00', 'active', NULL, 1, 1, '2024-06-10 00:51:17.656', '2024-06-10 00:51:17.656');
 
 -- --------------------------------------------------------
 
@@ -91,6 +123,13 @@ CREATE TABLE `events` (
   `sport_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `events`
+--
+
+INSERT INTO `events` (`id`, `name`, `event_place`, `event_date`, `sport_id`) VALUES
+(1, 'Superclásico', 'Santiago Bernabéu', '2024-06-10 15:00:00.000', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -107,11 +146,19 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `type`) VALUES
-(5, 'EDIT-PROFILE'),
-(6, 'MAKE-BET'),
-(7, 'MAKE-DEPOSIT'),
-(8, 'MAKE-WITDRAW'),
-(9, 'READ-BALANCE'),
+(17, 'BALANCE-READ'),
+(11, 'BANK-ACCOUNT-CREATE'),
+(14, 'BANK-ACCOUNT-DELETE'),
+(12, 'BANK-ACCOUNT-READ'),
+(13, 'BANK-ACCOUNT-UPDATE'),
+(6, 'BET-CREATE'),
+(9, 'BET-DELETE'),
+(7, 'BET-READ'),
+(8, 'BET-UPDATE'),
+(10, 'MAKE-BET'),
+(15, 'MAKE-DEPOSIT'),
+(16, 'MAKE-WITHDRAW'),
+(5, 'PROFILE-UPDATE'),
 (1, 'USER-CREATE'),
 (4, 'USER-DELETE'),
 (2, 'USER-READ'),
@@ -163,10 +210,14 @@ INSERT INTO `rolespermissions` (`id`, `role_id`, `permission_id`, `createdAt`, `
 (4, 1, 5, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000'),
 (5, 1, 7, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000'),
 (6, 1, 9, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000'),
-(7, 2, 6, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000'),
-(8, 2, 7, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000'),
-(9, 2, 8, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000'),
-(10, 2, 9, '2024-06-05 11:07:22.000', '2024-06-05 11:07:22.000');
+(11, 1, 10, '2024-06-05 19:05:38.000', '2024-06-05 19:05:38.000'),
+(12, 2, 17, '2024-06-08 13:18:18.000', '2024-06-08 13:18:18.000'),
+(13, 2, 10, '2024-06-08 13:18:18.000', '2024-06-08 13:18:18.000'),
+(14, 2, 15, '2024-06-08 13:18:50.000', '2024-06-08 13:18:50.000'),
+(15, 2, 16, '2024-06-08 13:19:57.000', '2024-06-08 13:19:57.000'),
+(16, 2, 7, '2024-06-08 16:47:55.000', '2024-06-08 16:47:55.000'),
+(17, 1, 8, '2024-06-09 16:08:28.000', '2024-06-09 16:08:28.000'),
+(19, 2, 5, '2024-06-09 20:13:33.000', '2024-06-09 20:13:33.000');
 
 -- --------------------------------------------------------
 
@@ -195,8 +246,16 @@ INSERT INTO `sports` (`id`, `name`) VALUES
 
 CREATE TABLE `teams` (
   `id` int(11) NOT NULL,
-  `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `teams`
+--
+
+INSERT INTO `teams` (`id`, `name`) VALUES
+(1, 'Barcelona'),
+(2, 'Real Madrid');
 
 -- --------------------------------------------------------
 
@@ -226,6 +285,16 @@ CREATE TABLE `users` (
   `deletedAt` datetime(3) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Volcado de datos para la tabla `users`
+--
+
+INSERT INTO `users` (`id`, `documentId`, `name`, `lastname`, `cellphone`, `email`, `address`, `gender`, `birthDate`, `city`, `username`, `password`, `remember_token`, `role_id`, `country_id`, `createdAt`, `updatedAt`, `deleted`, `deletedAt`) VALUES
+(1, '1232589088', 'Welker', 'Jose', '3213655354', 'welkerperez97@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'chorizo007', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 1, 1, '2024-06-05 16:32:31.037', '2024-06-05 16:32:31.037', 0, NULL),
+(2, '1232589088', 'Anggie', 'Castellanos', '3118365945', 'anggie@gmail.com', 'Calle 63d', 'F', '1997-12-12', 'Bucaramanga', 'pandefruta@gmail.com', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 1, 1, '2024-06-05 19:37:01.317', '2024-06-05 19:37:01.317', 0, NULL),
+(3, '1232589055', 'Player', 'Jose', '3213655355', 'player@gmail.com', 'Calle 63d', 'M', '1997-12-12', 'Bucaramanga', 'tiburonzin', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 2, 1, '2024-06-06 00:12:03.360', '2024-06-06 00:12:03.360', 0, NULL),
+(4, '1123456789', 'edited name', 'edited lastname', '3212565254', 'editedemail@gmail.com', 'Calle 63D #30 - 67', 'M', '1997/03/13', 'Bucaramanga', 'loquillo321', '6fa4d7fe116cec75a814426d68b4ab89353a1dd82033572ad9feb381ff0c547d', NULL, 2, 1, '2024-06-09 16:17:17.000', '2024-06-10 01:48:14.363', 0, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -234,13 +303,38 @@ CREATE TABLE `users` (
 
 CREATE TABLE `userstransactions` (
   `id` int(11) NOT NULL,
-  `amount_money` decimal(6,4) NOT NULL,
+  `amount_money` decimal(19,4) NOT NULL,
   `user_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `bet_id` int(11) DEFAULT NULL,
   `createdAt` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `updatedAt` datetime(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `userstransactions`
+--
+
+INSERT INTO `userstransactions` (`id`, `amount_money`, `user_id`, `category_id`, `bet_id`, `createdAt`, `updatedAt`) VALUES
+(39, '1000.0000', 3, 1, NULL, '2024-06-07 21:50:21.948', '2024-06-07 21:50:21.948'),
+(40, '1000.0000', 3, 1, NULL, '2024-06-07 21:53:29.886', '2024-06-07 21:53:29.886'),
+(41, '1000.0000', 3, 1, NULL, '2024-06-07 21:54:43.729', '2024-06-07 21:54:43.729'),
+(42, '1000.0000', 3, 1, NULL, '2024-06-07 21:54:45.935', '2024-06-07 21:54:45.935'),
+(43, '1000.0000', 3, 1, NULL, '2024-06-07 21:54:47.392', '2024-06-07 21:54:47.392'),
+(44, '1000.0000', 3, 1, NULL, '2024-06-07 21:54:48.868', '2024-06-07 21:54:48.868'),
+(45, '1000.0000', 3, 1, NULL, '2024-06-07 21:54:50.597', '2024-06-07 21:54:50.597'),
+(46, '40000.0000', 3, 1, NULL, '2024-06-07 21:55:18.379', '2024-06-07 21:55:18.379'),
+(47, '13501.2070', 3, 1, NULL, '2024-06-07 21:55:38.710', '2024-06-07 21:55:38.710'),
+(48, '15000.0000', 3, 2, NULL, '2024-06-07 21:56:04.193', '2024-06-07 21:56:04.193'),
+(52, '5000.0000', 3, 2, NULL, '2024-06-08 20:17:58.307', '2024-06-08 20:17:58.307'),
+(55, '50000.0000', 3, 2, NULL, '2024-06-08 20:36:36.596', '2024-06-08 20:36:36.596'),
+(56, '6300.0000', 3, 3, 1, '2024-06-08 20:39:04.561', '2024-06-08 20:39:04.561'),
+(57, '3700.0000', 3, 3, 2, '2024-06-08 20:39:04.592', '2024-06-08 20:39:04.592'),
+(58, '50000.0000', 4, 2, NULL, '2024-06-09 21:23:08.440', '2024-06-09 21:23:08.440'),
+(59, '7000.0000', 4, 3, 1, '2024-06-09 21:26:23.576', '2024-06-09 21:26:23.576'),
+(60, '3000.0000', 4, 3, 2, '2024-06-09 21:26:23.588', '2024-06-09 21:26:23.588'),
+(63, '15120.0000', 3, 4, 1, '2024-06-10 00:30:39.063', '2024-06-10 00:30:39.063'),
+(64, '16800.0000', 4, 4, 1, '2024-06-10 00:30:39.070', '2024-06-10 00:30:39.070');
 
 -- --------------------------------------------------------
 
@@ -271,10 +365,19 @@ INSERT INTO `_prisma_migrations` (`id`, `checksum`, `finished_at`, `migration_na
 --
 
 --
+-- Indices de la tabla `bankaccounts`
+--
+ALTER TABLE `bankaccounts`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `BankAccounts_user_id_key` (`user_id`),
+  ADD UNIQUE KEY `BankAccounts_account_number_key` (`account_number`);
+
+--
 -- Indices de la tabla `bets`
 --
 ALTER TABLE `bets`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `Bets_bet_option_key` (`bet_option`),
   ADD KEY `Bets_event_id_fkey` (`event_id`),
   ADD KEY `Bets_team_id_fkey` (`team_id`);
 
@@ -365,10 +468,16 @@ ALTER TABLE `_prisma_migrations`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `bankaccounts`
+--
+ALTER TABLE `bankaccounts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT de la tabla `bets`
 --
 ALTER TABLE `bets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `categories`
@@ -386,13 +495,13 @@ ALTER TABLE `countries`
 -- AUTO_INCREMENT de la tabla `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
@@ -404,7 +513,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT de la tabla `rolespermissions`
 --
 ALTER TABLE `rolespermissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de la tabla `sports`
@@ -416,23 +525,29 @@ ALTER TABLE `sports`
 -- AUTO_INCREMENT de la tabla `teams`
 --
 ALTER TABLE `teams`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `userstransactions`
 --
 ALTER TABLE `userstransactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `bankaccounts`
+--
+ALTER TABLE `bankaccounts`
+  ADD CONSTRAINT `BankAccounts_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `bets`
