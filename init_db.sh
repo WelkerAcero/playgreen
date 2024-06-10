@@ -5,7 +5,7 @@ until mysqladmin ping -hroundhouse.proxy.rlwy.net --port 52200 --silent; do
 done
 
 # Ejecutar migraciones
-npm run migrate
+#npm run migrate
 
 # Importar datos SQL
 mysql -hroundhouse.proxy.rlwy.net -uroot -uylQGHsqmWhMhpvbelLnPZMPXLAGkJPT --port 52200 --protocol=TCP railway < /app/Database/sportsbook.sql
